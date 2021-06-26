@@ -1,17 +1,14 @@
 <?php declare(strict_types=1);
 
-class ModelTest extends TestCase
-{
-    public function tearDown()
-    {
+class ModelTest extends TestCase {
+    public function tearDown() {
         User::truncate();
         Soft::truncate();
         Book::truncate();
         Item::truncate();
     }
 
-    public function testNewModel()
-    {
+    public function testNewModel() {
         $user = new User;
         $this->assertInstanceOf('Mpociot\Couchbase\Eloquent\Model', $user);
         $this->assertInstanceOf('Mpociot\Couchbase\Connection', $user->getConnection());
@@ -20,8 +17,7 @@ class ModelTest extends TestCase
         $this->assertEquals('_id', $user->getKeyName());
     }
 
-    public function testInsert()
-    {
+    public function testInsert() {
         $user = new User;
         $user->name = 'John Doe';
         $user->title = 'admin';
@@ -42,8 +38,7 @@ class ModelTest extends TestCase
         $this->assertEquals(35, $user->age);
     }
 
-    public function testUpdate()
-    {
+    public function testUpdate() {
         $user = new User;
         $user->name = 'John Doe';
         $user->title = 'admin';
@@ -69,8 +64,7 @@ class ModelTest extends TestCase
         $this->assertEquals(20, $check->age);
     }
 
-    public function testManualStringId()
-    {
+    public function testManualStringId() {
         $user = new User;
         $user->_id = '4af9f23d8ead0e1d32000000';
         $user->name = 'John Doe';
@@ -97,8 +91,7 @@ class ModelTest extends TestCase
         $this->assertInternalType('string', $raw['_id']);
     }
 
-    public function testManualIntId()
-    {
+    public function testManualIntId() {
         $user = new User;
         $user->_id = 1;
         $user->name = 'John Doe';
@@ -113,8 +106,7 @@ class ModelTest extends TestCase
         $this->assertInternalType('string', $raw['_id']);
     }
 
-    public function testDelete()
-    {
+    public function testDelete() {
         $user = new User;
         $user->name = 'John Doe';
         $user->title = 'admin';
@@ -129,8 +121,7 @@ class ModelTest extends TestCase
         $this->assertEquals(0, User::count());
     }
 
-    public function testAll()
-    {
+    public function testAll() {
         $user = new User;
         $user->name = 'John Doe';
         $user->title = 'admin';
@@ -150,8 +141,7 @@ class ModelTest extends TestCase
         $this->assertContains('Jane Doe', $all->pluck('name'));
     }
 
-    public function testFind()
-    {
+    public function testFind() {
         $user = new User;
         $user->name = 'John Doe';
         $user->title = 'admin';
@@ -168,8 +158,7 @@ class ModelTest extends TestCase
         $this->assertEquals(35, $check->age);
     }
 
-    public function testGet()
-    {
+    public function testGet() {
         User::insert([
             ['name' => 'John Doe'],
             ['name' => 'Jane Doe'],
@@ -181,8 +170,7 @@ class ModelTest extends TestCase
         $this->assertInstanceOf('Mpociot\Couchbase\Eloquent\Model', $users[0]);
     }
 
-    public function testFirst()
-    {
+    public function testFirst() {
         User::insert([
             ['name' => 'John Doe'],
             ['name' => 'Jane Doe'],
@@ -193,8 +181,7 @@ class ModelTest extends TestCase
         $this->assertEquals('John Doe', $user->name);
     }
 
-    public function testNoDocument()
-    {
+    public function testNoDocument() {
         $items = Item::where('name', 'nothing')->get();
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $items);
         $this->assertEquals(0, $items->count());
@@ -206,14 +193,12 @@ class ModelTest extends TestCase
         $this->assertEquals(null, $item);
     }
 
-    public function testFindOrfail()
-    {
+    public function testFindOrfail() {
         $this->setExpectedException('Illuminate\Database\Eloquent\ModelNotFoundException');
         User::findOrfail('51c33d8981fec6813e00000a');
     }
 
-    public function testCreate()
-    {
+    public function testCreate() {
         $user = User::create(['name' => 'Jane Poe']);
 
         $this->assertInstanceOf('Mpociot\Couchbase\Eloquent\Model', $user);
@@ -224,8 +209,7 @@ class ModelTest extends TestCase
         $this->assertEquals($user->_id, $check->_id);
     }
 
-    public function testDestroy()
-    {
+    public function testDestroy() {
         $user = new User;
         $user->name = 'John Doe';
         $user->title = 'admin';
@@ -237,8 +221,7 @@ class ModelTest extends TestCase
         $this->assertEquals(0, User::count());
     }
 
-    public function testTouch()
-    {
+    public function testTouch() {
         $user = new User;
         $user->name = 'John Doe';
         $user->title = 'admin';
@@ -254,8 +237,7 @@ class ModelTest extends TestCase
         $this->assertNotEquals($old, $check->updated_at);
     }
 
-    public function testSoftDelete()
-    {
+    public function testSoftDelete() {
         Soft::create(['name' => 'John Doe']);
         Soft::create(['name' => 'Jane Doe']);
 
@@ -288,8 +270,7 @@ class ModelTest extends TestCase
     /**
      * @group testPrimaryKey
      */
-    public function testPrimaryKeyUsingFind()
-    {
+    public function testPrimaryKeyUsingFind() {
         $user = new User;
         $this->assertEquals('_id', $user->getKeyName());
 
@@ -311,8 +292,7 @@ class ModelTest extends TestCase
     /**
      * @group testPrimaryKeyUsingWhere
      */
-    public function testPrimaryKeyUsingWhere()
-    {
+    public function testPrimaryKeyUsingWhere() {
         $book = new Book;
         $book->title = 'False Book';
         $book->save();
@@ -340,8 +320,7 @@ class ModelTest extends TestCase
     /**
      * @group testPrimaryKeyUsingWhere
      */
-    public function testPrimaryKeyUsingUseKeys()
-    {
+    public function testPrimaryKeyUsingUseKeys() {
         $book = new Book;
         $book->title = 'False Book';
         $book->save();
@@ -366,8 +345,7 @@ class ModelTest extends TestCase
         $this->assertEquals('A Game of Thrones Where', $check->title);
     }
 
-    public function testScope()
-    {
+    public function testScope() {
         Item::insert([
             ['name' => 'knife', 'type' => 'sharp'],
             ['name' => 'spoon', 'type' => 'round'],
@@ -377,8 +355,7 @@ class ModelTest extends TestCase
         $this->assertEquals(1, $sharp->count());
     }
 
-    public function testToArray()
-    {
+    public function testToArray() {
         $item = Item::create(['name' => 'fork', 'type' => 'sharp']);
 
         $array = $item->toArray();
@@ -393,8 +370,7 @@ class ModelTest extends TestCase
     /**
      * @group testUnset
      */
-    public function testUnset()
-    {
+    public function testUnset() {
         $user1 = User::create(['name' => 'John Doe', 'note1' => 'ABC', 'note2' => 'DEF']);
         $user2 = User::create(['name' => 'Jane Doe', 'note1' => 'ABC', 'note2' => 'DEF']);
 
@@ -431,8 +407,7 @@ class ModelTest extends TestCase
         $this->assertFalse(isset($user2->note2));
     }
 
-    public function testDotNotation()
-    {
+    public function testDotNotation() {
         $user = User::create([
             'name' => 'John Doe',
             'address' => [
@@ -453,8 +428,7 @@ class ModelTest extends TestCase
         $this->assertEquals('Strasbourg', $user['address.city']);
     }
 
-    public function testModelExists()
-    {
+    public function testModelExists() {
         $user = new User();
         $this->assertFalse($user->exists);
         $user->save();
@@ -463,8 +437,7 @@ class ModelTest extends TestCase
         $this->assertFalse($user->exists);
     }
 
-    public function testModelExistsWithOtherExisting()
-    {
+    public function testModelExistsWithOtherExisting() {
         User::create([
             'name' => 'John Doe'
         ]);

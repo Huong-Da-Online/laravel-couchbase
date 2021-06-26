@@ -1,19 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace Mpociot\Couchbase\Relations;
+namespace HuongDaOnline\Couchbase\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EmbedsOne extends EmbedsOneOrMany
-{
+class EmbedsOne extends EmbedsOneOrMany {
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array $models
-     * @param  string $relation
+     * @param array $models
+     * @param string $relation
      */
-    public function initRelation(array $models, $relation)
-    {
+    public function initRelation(array $models, $relation) {
         foreach ($models as $model) {
             $model->setRelation($relation, null);
         }
@@ -26,19 +24,17 @@ class EmbedsOne extends EmbedsOneOrMany
      *
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function getResults()
-    {
+    public function getResults() {
         return $this->toModel($this->getEmbedded());
     }
 
     /**
      * Save a new model and attach it to the parent model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @param \Illuminate\Database\Eloquent\Model $model
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function performInsert(Model $model)
-    {
+    public function performInsert(Model $model) {
         // Generate a new key if needed.
         if ($model->getKeyName() == '_id' and !$model->getKey()) {
             $model->setAttribute('_id', uniqid());
@@ -64,11 +60,10 @@ class EmbedsOne extends EmbedsOneOrMany
     /**
      * Save an existing model and attach it to the parent model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @param \Illuminate\Database\Eloquent\Model $model
      * @return \Illuminate\Database\Eloquent\Model|bool
      */
-    public function performUpdate(Model $model)
-    {
+    public function performUpdate(Model $model) {
         if ($this->isNested()) {
             $this->associate($model);
 
@@ -91,11 +86,10 @@ class EmbedsOne extends EmbedsOneOrMany
     /**
      * Delete an existing model and detach it from the parent model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @param \Illuminate\Database\Eloquent\Model $model
      * @return int
      */
-    public function performDelete(Model $model)
-    {
+    public function performDelete(Model $model) {
         // For deeply nested documents, let the parent handle the changes.
         if ($this->isNested()) {
             $this->dissociate($model);
@@ -117,11 +111,10 @@ class EmbedsOne extends EmbedsOneOrMany
     /**
      * Attach the model to its parent.
      *
-     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @param \Illuminate\Database\Eloquent\Model $model
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function associate(Model $model)
-    {
+    public function associate(Model $model) {
         return $this->setEmbedded($model->getAttributes());
     }
 
@@ -130,8 +123,7 @@ class EmbedsOne extends EmbedsOneOrMany
      *
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function dissociate()
-    {
+    public function dissociate() {
         return $this->setEmbedded(null);
     }
 
@@ -140,8 +132,7 @@ class EmbedsOne extends EmbedsOneOrMany
      *
      * @return int
      */
-    public function delete()
-    {
+    public function delete() {
         $model = $this->getResults();
 
         return $this->performDelete($model);

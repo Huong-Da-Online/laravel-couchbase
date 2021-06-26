@@ -1,9 +1,7 @@
 <?php declare(strict_types=1);
 
-class MysqlRelationsTest extends TestCase
-{
-    public function setUp()
-    {
+class MysqlRelationsTest extends TestCase {
+    public function setUp() {
         parent::setUp();
 
         MysqlUser::executeSchema();
@@ -11,15 +9,13 @@ class MysqlRelationsTest extends TestCase
         MysqlRole::executeSchema();
     }
 
-    public function tearDown()
-    {
+    public function tearDown() {
         MysqlUser::truncate();
         MysqlBook::truncate();
         MysqlRole::truncate();
     }
 
-    public function testMysqlRelations()
-    {
+    public function testMysqlRelations() {
         $user = new MysqlUser;
         $this->assertInstanceOf('MysqlUser', $user);
         $this->assertInstanceOf('Illuminate\Database\MySqlConnection', $user->getConnection());

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Mpociot\Couchbase\Query;
+namespace HuongDaOnline\Couchbase\Query;
 
 use Couchbase\Exception;
 use Illuminate\Contracts\Support\Arrayable;
@@ -10,11 +10,10 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar as BaseGrammar;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Mpociot\Couchbase\Connection;
-use Mpociot\Couchbase\Helper;
+use HuongDaOnline\Couchbase\Connection;
+use HuongDaOnline\Couchbase\Helper;
 
-class Builder extends BaseBuilder
-{
+class Builder extends BaseBuilder {
 
     /**
      * The column projections.
@@ -150,22 +149,22 @@ class Builder extends BaseBuilder
     /**
      * Create a new query builder instance.
      *
-     * @param  ConnectionInterface $connection
-     * @param  BaseGrammar $grammar
-     * @param  Processor $processor
-     * @throws \Exception
+     * @param ConnectionInterface $connection
+     * @param BaseGrammar $grammar
+     * @param Processor $processor
      * @return void
+     * @throws \Exception
      */
     public function __construct(
         ConnectionInterface $connection,
         BaseGrammar $grammar = null,
         Processor $processor = null
     ) {
-        if(!($connection instanceof Connection)) {
-            throw new \Exception('Argument 1 passed to '.get_class($this).'::__construct() must be an instance of '.Connection::class.', instance of '.get_class($connection).' given.');
+        if (!($connection instanceof Connection)) {
+            throw new \Exception('Argument 1 passed to ' . get_class($this) . '::__construct() must be an instance of ' . Connection::class . ', instance of ' . get_class($connection) . ' given.');
         }
-        if(!($grammar === null || $grammar instanceof Grammar)) {
-            throw new \Exception('Argument 2 passed to '.get_class($this).'::__construct() must be an instance of '.Grammar::class.', instance of '.get_class($grammar).' given.');
+        if (!($grammar === null || $grammar instanceof Grammar)) {
+            throw new \Exception('Argument 2 passed to ' . get_class($this) . '::__construct() must be an instance of ' . Grammar::class . ', instance of ' . get_class($grammar) . ' given.');
         }
 
         parent::__construct($connection, $grammar, $processor);
@@ -179,8 +178,7 @@ class Builder extends BaseBuilder
      * @return $this
      * @throws Exception
      */
-    public function useKeys($keys)
-    {
+    public function useKeys($keys) {
         if (!empty($this->indexes)) {
             throw new Exception('Only one of useKeys or useIndex can be used, not both.');
         }
@@ -198,8 +196,7 @@ class Builder extends BaseBuilder
      * @return $this
      * @throws Exception
      */
-    public function useIndex($name, $type = Grammar::INDEX_TYPE_GSI)
-    {
+    public function useIndex($name, $type = Grammar::INDEX_TYPE_GSI) {
         if ($this->keys !== null) {
             throw new Exception('Only one of useKeys or useIndex can be used, not both.');
         }
@@ -216,8 +213,7 @@ class Builder extends BaseBuilder
      *
      * @return $this
      */
-    public function returning(array $column = ['*'])
-    {
+    public function returning(array $column = ['*']) {
         $this->returning = $column;
 
         return $this;
@@ -228,8 +224,7 @@ class Builder extends BaseBuilder
      *
      * @return bool
      */
-    protected function shouldUseCollections()
-    {
+    protected function shouldUseCollections() {
         if (function_exists('app')) {
             $version = app()->version();
             $version = filter_var(explode(')', $version)[0],
@@ -243,11 +238,10 @@ class Builder extends BaseBuilder
     /**
      * Set the table which the query is targeting.
      *
-     * @param  string $type
+     * @param string $type
      * @return $this
      */
-    public function from($type)
-    {
+    public function from($type) {
         $this->from = $this->connection->getBucketName();
         $this->type = $type;
 
@@ -262,8 +256,7 @@ class Builder extends BaseBuilder
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    public function forNestedWhere()
-    {
+    public function forNestedWhere() {
         // ->from($this->from) is wrong, and ->from($this->type) is redundant in nested where
         return $this->newQuery()->from(null);
     }
@@ -271,11 +264,10 @@ class Builder extends BaseBuilder
     /**
      * Set the projections.
      *
-     * @param  array $columns
+     * @param array $columns
      * @return $this
      */
-    public function project($columns)
-    {
+    public function project($columns) {
         $this->projections = is_array($columns) ? $columns : func_get_args();
 
         return $this;
@@ -284,11 +276,10 @@ class Builder extends BaseBuilder
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array $columns
+     * @param array $columns
      * @return \stdClass
      */
-    public function getWithMeta($columns = ['*'])
-    {
+    public function getWithMeta($columns = ['*']) {
         $original = $this->columns;
 
         if (is_null($original)) {
@@ -313,11 +304,10 @@ class Builder extends BaseBuilder
     /**
      * Set the cursor timeout in seconds.
      *
-     * @param  int $seconds
+     * @param int $seconds
      * @return $this
      */
-    public function timeout($seconds)
-    {
+    public function timeout($seconds) {
         $this->timeout = $seconds;
 
         return $this;
@@ -326,11 +316,10 @@ class Builder extends BaseBuilder
     /**
      * Set the cursor hint.
      *
-     * @param  mixed $index
+     * @param mixed $index
      * @return $this
      */
-    public function hint($index)
-    {
+    public function hint($index) {
         $this->hint = $index;
 
         return $this;
@@ -339,12 +328,11 @@ class Builder extends BaseBuilder
     /**
      * Execute a query for a single record by ID.
      *
-     * @param  mixed $id
-     * @param  array $columns
+     * @param mixed $id
+     * @param array $columns
      * @return mixed|static
      */
-    public function find($id, $columns = ['*'])
-    {
+    public function find($id, $columns = ['*']) {
         if (is_array($id) === true) {
             return $this->useKeys($id)->get($columns);
         }
@@ -356,8 +344,7 @@ class Builder extends BaseBuilder
      *
      * @return string
      */
-    public function generateCacheKey()
-    {
+    public function generateCacheKey() {
         $key = [
             'bucket' => $this->from,
             'type' => $this->type,
@@ -376,12 +363,11 @@ class Builder extends BaseBuilder
     /**
      * Execute an aggregate function on the database.
      *
-     * @param  string $function
-     * @param  array $columns
+     * @param string $function
+     * @param array $columns
      * @return mixed
      */
-    public function aggregate($function, $columns = ['*'])
-    {
+    public function aggregate($function, $columns = ['*']) {
         // added orders to ignore...
         $results = $this->cloneWithout(['orders', 'columns'])
             ->cloneWithoutBindings(['select'])
@@ -398,22 +384,20 @@ class Builder extends BaseBuilder
      *
      * @return bool
      */
-    public function exists()
-    {
+    public function exists() {
         return !is_null($this->first([Grammar::VIRTUAL_META_ID_COLUMN]));
     }
 
     /**
      * Add a where between statement to the query.
      *
-     * @param  string $column
-     * @param  array $values
-     * @param  string $boolean
-     * @param  bool $not
+     * @param string $column
+     * @param array $values
+     * @param string $boolean
+     * @param bool $not
      * @return Builder
      */
-    public function whereBetween($column, array $values, $boolean = 'and', $not = false)
-    {
+    public function whereBetween($column, array $values, $boolean = 'and', $not = false) {
         $type = 'between';
 
         $this->wheres[] = compact('column', 'type', 'boolean', 'values', 'not');
@@ -427,40 +411,37 @@ class Builder extends BaseBuilder
     /**
      * Set the bindings on the query builder.
      *
-     * @param  array $bindings
-     * @param  string $type
+     * @param array $bindings
+     * @param string $type
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function setBindings(array $bindings, $type = 'where')
-    {
+    public function setBindings(array $bindings, $type = 'where') {
         return parent::setBindings($bindings, $type);
     }
 
     /**
      * Add a binding to the query.
      *
-     * @param  mixed $value
-     * @param  string $type
+     * @param mixed $value
+     * @param string $type
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function addBinding($value, $type = 'where')
-    {
+    public function addBinding($value, $type = 'where') {
         return parent::addBinding($value, $type);
     }
 
     /**
      * Set the limit and offset for a given page.
      *
-     * @param  int $page
-     * @param  int $perPage
+     * @param int $page
+     * @param int $perPage
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function forPage($page, $perPage = 15)
-    {
+    public function forPage($page, $perPage = 15) {
         $this->paginating = true;
 
         return $this->skip(($page - 1) * $perPage)->take($perPage);
@@ -473,8 +454,7 @@ class Builder extends BaseBuilder
      *
      * @return bool
      */
-    public function insert(array $values)
-    {
+    public function insert(array $values) {
         // Since every insert gets treated like a batch insert, we will have to detect
         // if the user is inserting a single document or an array of documents.
         $batch = true;
@@ -509,11 +489,10 @@ class Builder extends BaseBuilder
     /**
      * Update a record in the database.
      *
-     * @param  array $values
+     * @param array $values
      * @return int
      */
-    public function update(array $values)
-    {
+    public function update(array $values) {
         // replace MissingValue in 2nd or deeper levels
         foreach ($values as $key => $value) {
             $values[$key] = Grammar::removeMissingValue($value);
@@ -524,12 +503,11 @@ class Builder extends BaseBuilder
     /**
      * Insert a new record and get the value of the primary key.
      *
-     * @param  array $values
-     * @param  string $sequence
+     * @param array $values
+     * @param string $sequence
      * @return int
      */
-    public function insertGetId(array $values, $sequence = null)
-    {
+    public function insertGetId(array $values, $sequence = null) {
         if (!is_null($sequence) && isset($values[$sequence])) {
             $this->useKeys((string)$values[$sequence]);
         } elseif (isset($values['_id'])) {
@@ -542,12 +520,11 @@ class Builder extends BaseBuilder
     /**
      * Get an array with the values of a given column.
      *
-     * @param  string $column
-     * @param  string|null $key
+     * @param string $column
+     * @param string|null $key
      * @return \Illuminate\Support\Collection
      */
-    public function pluck($column, $key = null)
-    {
+    public function pluck($column, $key = null) {
         $results = $this->get(is_null($key) ? [$column] : [$column, $key]);
 
         // Convert ObjectID's to strings
@@ -565,35 +542,32 @@ class Builder extends BaseBuilder
     /**
      * Run a truncate statement on the table.
      */
-    public function truncate()
-    {
+    public function truncate() {
         return $this->delete();
     }
 
     /**
      * Get an array with the values of a given column.
      *
-     * @deprecated
-     * @param  string $column
-     * @param  string $key
+     * @param string $column
+     * @param string $key
      * @return array
+     * @deprecated
      */
-    public function lists($column, $key = null)
-    {
+    public function lists($column, $key = null) {
         return $this->pluck($column, $key);
     }
 
     /**
      * Append one or more values to an array.
      *
-     * @param  mixed $column
-     * @param  mixed $value
+     * @param mixed $column
+     * @param mixed $value
      * @param bool $unique
      *
      * @return array|\Couchbase\Document
      */
-    public function push($column, $value = null, $unique = false)
-    {
+    public function push($column, $value = null, $unique = false) {
         $obj = $this->connection->getCouchbaseBucket()->get($this->keys);
         if (!isset($obj->value->{$column})) {
             $obj->value->{$column} = [];
@@ -614,14 +588,13 @@ class Builder extends BaseBuilder
     /**
      * Remove one or more values from an array.
      *
-     * @param  mixed $column
-     * @param  mixed $value
+     * @param mixed $column
+     * @param mixed $value
      *
      * @return array|\Couchbase\Document|null
      * @throws Exception
      */
-    public function pull($column, $value = null)
-    {
+    public function pull($column, $value = null) {
         try {
             $obj = $this->connection->getCouchbaseBucket()->get($this->keys);
         } catch (Exception $e) {
@@ -644,7 +617,7 @@ class Builder extends BaseBuilder
         $filtered = collect($obj->value->{$column})->reject(function ($val, $key) use ($value) {
             $match = false;
             if (is_object($val)) {
-                foreach ($value AS $matchKey => $matchValue) {
+                foreach ($value as $matchKey => $matchValue) {
                     if ($val->{$matchKey} === $value[$matchKey]) {
                         $match = true;
                     }
@@ -663,11 +636,10 @@ class Builder extends BaseBuilder
     /**
      * Remove all of the expressions from a list of bindings.
      *
-     * @param  array $bindings
+     * @param array $bindings
      * @return array
      */
-    protected function cleanBindings(array $bindings)
-    {
+    protected function cleanBindings(array $bindings) {
         return array_values(array_filter(parent::cleanBindings($bindings),
             function ($binding) {
                 return !($binding instanceof MissingValue);
@@ -677,11 +649,10 @@ class Builder extends BaseBuilder
     /**
      * Remove one or more fields.
      *
-     * @param  mixed $columns
+     * @param mixed $columns
      * @return int
      */
-    public function drop($columns)
-    {
+    public function drop($columns) {
         if (!is_array($columns)) {
             $columns = [$columns];
         }
@@ -694,8 +665,7 @@ class Builder extends BaseBuilder
     /**
      * @return Grammar
      */
-    public function getGrammar() : Grammar
-    {
+    public function getGrammar(): Grammar {
         return parent::getGrammar();
     }
 
@@ -704,8 +674,7 @@ class Builder extends BaseBuilder
      *
      * @return Builder
      */
-    public function newQuery()
-    {
+    public function newQuery() {
         return new Builder($this->connection, $this->grammar, $this->processor);
     }
 
@@ -714,8 +683,7 @@ class Builder extends BaseBuilder
      *
      * @return \stdClass
      */
-    protected function runSelectWithMeta()
-    {
+    protected function runSelectWithMeta() {
         return $this->connection->selectWithMeta(
             $this->toSql(),
             $this->getBindings(),
@@ -726,27 +694,25 @@ class Builder extends BaseBuilder
     /**
      * Convert a key to ObjectID if needed.
      *
-     * @param  mixed $id
+     * @param mixed $id
      * @return mixed
      */
-    public function convertKey($id)
-    {
+    public function convertKey($id) {
         return $id;
     }
 
     /**
      * Add a FOR ... IN query
      *
-     * @param  string $column
-     * @param  mixed $value
-     * @param  string $alias
-     * @param  array $values
+     * @param string $column
+     * @param mixed $value
+     * @param string $alias
+     * @param array $values
      * @return \Illuminate\Database\Query\Builder|static
      *
      * @throws \InvalidArgumentException
      */
-    public function forIn($column, $value, $alias, $values)
-    {
+    public function forIn($column, $value, $alias, $values) {
         $this->forIns[] = compact('column', 'value', 'alias', 'values');
 
         return $this;
@@ -755,16 +721,15 @@ class Builder extends BaseBuilder
     /**
      * Add a basic where clause to the query.
      *
-     * @param  string $column
-     * @param  string $operator
-     * @param  mixed $value
-     * @param  string $boolean
+     * @param string $column
+     * @param string $operator
+     * @param mixed $value
+     * @param string $boolean
      * @return \Illuminate\Database\Query\Builder|static
      *
      * @throws \InvalidArgumentException
      */
-    public function where($column, $operator = null, $value = null, $boolean = 'and')
-    {
+    public function where($column, $operator = null, $value = null, $boolean = 'and') {
         if ($column === '_id') {
             $column = $this->grammar->getMetaIdExpression($this);
         }
@@ -774,16 +739,15 @@ class Builder extends BaseBuilder
     /**
      * Add a raw where clause to the query.
      *
-     * @param  string  $sql
-     * @param  mixed   $bindings
-     * @param  string  $boolean
+     * @param string $sql
+     * @param mixed $bindings
+     * @param string $boolean
      * @return $this
      */
-    public function whereRaw($sql, $bindings = [], $boolean = 'and')
-    {
+    public function whereRaw($sql, $bindings = [], $boolean = 'and') {
         $this->wheres[] = ['type' => 'raw', 'sql' => $sql, 'boolean' => $boolean, 'bindings' => $bindings];
 
-        $this->addBinding((array) $bindings, 'where');
+        $this->addBinding((array)$bindings, 'where');
 
         return $this;
     }
@@ -791,13 +755,12 @@ class Builder extends BaseBuilder
     /**
      * Add a "where null" clause to the query.
      *
-     * @param  string $column
-     * @param  string $boolean
-     * @param  bool $not
+     * @param string $column
+     * @param string $boolean
+     * @param bool $not
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function whereNull($column, $boolean = 'and', $not = false)
-    {
+    public function whereNull($column, $boolean = 'and', $not = false) {
         if ($column === '_id') {
             if ($not) {
                 // the meta().id of a document is never null
@@ -812,13 +775,12 @@ class Builder extends BaseBuilder
     /**
      * Add a "where in" clause to the query.
      *
-     * @param  string $column
-     * @param  mixed $values
-     * @param  string $boolean
+     * @param string $column
+     * @param mixed $values
+     * @param string $boolean
      * @return $this
      */
-    public function whereAnyIn($column, $values, $boolean = 'and')
-    {
+    public function whereAnyIn($column, $values, $boolean = 'and') {
         $type = 'AnyIn';
 
         if ($values instanceof Arrayable) {
@@ -839,11 +801,10 @@ class Builder extends BaseBuilder
     /**
      * Set custom options for the query.
      *
-     * @param  array $options
+     * @param array $options
      * @return $this
      */
-    public function options(array $options)
-    {
+    public function options(array $options) {
         $this->options = $options;
 
         return $this;
@@ -854,8 +815,7 @@ class Builder extends BaseBuilder
      *
      * @return array
      */
-    protected function detectValues($values)
-    {
+    protected function detectValues($values) {
         foreach ($values as &$value) {
             $value[Helper::TYPE_NAME] = $this->type;
         }
@@ -865,12 +825,11 @@ class Builder extends BaseBuilder
     /**
      * Handle dynamic method calls into the method.
      *
-     * @param  string $method
-     * @param  array $parameters
+     * @param string $method
+     * @param array $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
-    {
+    public function __call($method, $parameters) {
         if ($method == 'unset') {
             return call_user_func_array([$this, 'drop'], $parameters);
         }

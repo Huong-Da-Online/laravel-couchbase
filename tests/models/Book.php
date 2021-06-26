@@ -1,21 +1,18 @@
 <?php declare(strict_types=1);
 
-use Mpociot\Couchbase\Eloquent\Model as Eloquent;
+use HuongDaOnline\Couchbase\Eloquent\Model as Eloquent;
 
-class Book extends Eloquent
-{
+class Book extends Eloquent {
     protected $connection = 'couchbase-not-default';
     protected $table = 'books';
     protected static $unguarded = true;
     protected $primaryKey = 'title';
 
-    public function author()
-    {
+    public function author() {
         return $this->belongsTo(User::class, 'author_id');
     }
 
-    public function mysqlAuthor()
-    {
+    public function mysqlAuthor() {
         return $this->belongsTo('MysqlUser', 'author_id');
     }
 }

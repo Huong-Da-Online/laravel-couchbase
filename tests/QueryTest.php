@@ -2,15 +2,13 @@
 
 use Mpociot\Couchbase\Query\MissingValue;
 
-class QueryTest extends TestCase
-{
+class QueryTest extends TestCase {
     protected static $started = false;
 
     /**
      * @group QueryTest
      */
-    public function setUp()
-    {
+    public function setUp() {
         parent::setUp();
         User::create(['name' => 'John Doe', 'age' => 35, 'title' => 'admin']);
         User::create(['name' => 'Jane Doe', 'age' => 33, 'title' => 'admin']);
@@ -26,8 +24,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function tearDown()
-    {
+    public function tearDown() {
         User::truncate();
         parent::tearDown();
     }
@@ -35,8 +32,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testWhere()
-    {
+    public function testWhere() {
         $users = User::where('age', 35)->get();
         $this->assertEquals(3, count($users));
 
@@ -59,8 +55,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testAndWhere()
-    {
+    public function testAndWhere() {
         $users = User::where('age', 35)->where('title', 'admin')->get();
         $this->assertEquals(2, count($users));
 
@@ -71,8 +66,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testWhereIn()
-    {
+    public function testWhereIn() {
         $users = User::whereIn('age', [35, 33])->get();
         $this->assertEquals(5, count($users));
     }
@@ -80,8 +74,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testWhereNotIn()
-    {
+    public function testWhereNotIn() {
         $users = User::whereNotIn('age', [13, 23, 37, 33])->get();
         $this->assertEquals(3, count($users));
     }
@@ -89,8 +82,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testBetween()
-    {
+    public function testBetween() {
         $users = User::whereBetween('age', [0, 25])->get();
         $this->assertEquals(2, count($users));
         $users = User::whereBetween('age', [13, 23])->get();
@@ -103,8 +95,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testAggregations()
-    {
+    public function testAggregations() {
         $this->assertEquals(9, User::count());
 
         $this->assertEquals(37, User::max('age'));
@@ -119,8 +110,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testLike()
-    {
+    public function testLike() {
         $users = User::where('name', 'like', '%Doe')->get();
         $this->assertEquals(2, count($users));
 
@@ -137,8 +127,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testSelect()
-    {
+    public function testSelect() {
         $user = User::where('name', 'John Doe')->select('name')->first();
 
         $this->assertEquals('John Doe', $user->name);
@@ -166,8 +155,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testOrWhere()
-    {
+    public function testOrWhere() {
         $users = User::where('age', 13)->orWhere('title', 'admin')->get();
         $this->assertEquals(4, count($users));
 
@@ -178,8 +166,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testWhereNull()
-    {
+    public function testWhereNull() {
         $users = User::whereNull('age')->get();
         $this->assertEquals(1, count($users));
     }
@@ -187,8 +174,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testWhereNotNull()
-    {
+    public function testWhereNotNull() {
         $users = User::whereNotNull('age')->get();
         $this->assertEquals(8, count($users));
     }
@@ -196,8 +182,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testOrder()
-    {
+    public function testOrder() {
         $user = User::whereNotNull('age')->orderBy('age', 'asc')->first();
         $this->assertEquals(13, $user->age);
 
@@ -220,8 +205,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testCount()
-    {
+    public function testCount() {
         $count = User::where('age', '<>', 35)->count();
         $this->assertEquals(5, $count);
     }
@@ -229,8 +213,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testExists()
-    {
+    public function testExists() {
         $this->assertFalse(User::where('age', '>', 37)->exists());
         $this->assertTrue(User::where('age', '<', 37)->exists());
     }
@@ -238,8 +221,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testMultipleOr()
-    {
+    public function testMultipleOr() {
         $users = User::where(function ($query) {
             $query->where('age', 35)->orWhere('age', 33);
         })
@@ -254,8 +236,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testSubquery()
-    {
+    public function testSubquery() {
         $users = User::where('title', 'admin')->orWhere(function ($query) {
             $query->where('name', 'Tommy Toe')
                 ->orWhere('name', 'Error');
@@ -299,8 +280,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testPaginate()
-    {
+    public function testPaginate() {
         $results = User::paginate(2);
         $this->assertEquals(2, $results->count());
         $this->assertNotNull($results->first()->title);
@@ -316,8 +296,7 @@ class QueryTest extends TestCase
     /**
      * @group QueryTest
      */
-    public function testPluckIdId()
-    {
+    public function testPluckIdId() {
         $result = User::query()->pluck('_id', '_id');
         $this->assertInstanceOf(Illuminate\Support\Collection::class, $result);
         $this->assertGreaterThan(0, $result->count());
@@ -330,8 +309,7 @@ class QueryTest extends TestCase
      * @group QueryTest
      * @group MissingValue
      */
-    public function testCreateWithMissingValue()
-    {
+    public function testCreateWithMissingValue() {
         $user = User::create([
             'firstname' => 'Max1',
             'lastname' => 'Mustermann',
@@ -359,8 +337,7 @@ class QueryTest extends TestCase
      * @group QueryTest
      * @group MissingValue
      */
-    public function testUpdateViaAttributesWithMissingValue()
-    {
+    public function testUpdateViaAttributesWithMissingValue() {
         $user = User::create([
             'firstname' => 'Max2',
             'lastname' => 'Mustermann',
@@ -391,8 +368,7 @@ class QueryTest extends TestCase
      * @group QueryTest
      * @group MissingValue
      */
-    public function testUpdateViaMethodWithMissingValue()
-    {
+    public function testUpdateViaMethodWithMissingValue() {
         $user = User::create([
             'firstname' => 'Max3',
             'lastname' => 'Mustermann',
@@ -421,8 +397,7 @@ class QueryTest extends TestCase
      * @group QueryTest
      * @group MissingValue
      */
-    public function testUpdateWithMissingValueInSubLevel()
-    {
+    public function testUpdateWithMissingValueInSubLevel() {
         $user = User::create([
             'firstname' => 'Max4',
             'lastname' => 'Mustermann',
@@ -464,8 +439,7 @@ class QueryTest extends TestCase
      * @group QueryTest
      * @group MissingValue
      */
-    public function testDropValue()
-    {
+    public function testDropValue() {
         $user = User::create([
             'firstname' => 'Max6',
             'lastname' => 'Mustermann',
@@ -492,8 +466,7 @@ class QueryTest extends TestCase
      * @group QueryTest
      * @group MissingValue
      */
-    public function testDropValues()
-    {
+    public function testDropValues() {
         $user = User::create([
             'firstname' => 'Max7',
             'lastname' => 'Mustermann',

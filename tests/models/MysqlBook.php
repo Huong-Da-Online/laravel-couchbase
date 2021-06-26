@@ -2,10 +2,9 @@
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Facades\Schema;
-use Mpociot\Couchbase\Eloquent\HybridRelations;
+use HuongDaOnline\Couchbase\Eloquent\HybridRelations;
 
-class MysqlBook extends Eloquent
-{
+class MysqlBook extends Eloquent {
     use HybridRelations;
 
     protected $connection = 'mysql';
@@ -13,16 +12,14 @@ class MysqlBook extends Eloquent
     protected static $unguarded = true;
     protected $primaryKey = 'title';
 
-    public function author()
-    {
+    public function author() {
         return $this->belongsTo('User', 'author_id');
     }
 
     /**
      * Check if we need to run the schema.
      */
-    public static function executeSchema()
-    {
+    public static function executeSchema() {
         $schema = Schema::connection('mysql');
 
         if (!$schema->hasTable('books')) {

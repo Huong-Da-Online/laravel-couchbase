@@ -1,66 +1,59 @@
 <?php declare(strict_types=1);
 
-namespace Mpociot\Couchbase\Relations;
+namespace HuongDaOnline\Couchbase\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany as EloquentBelongsToMany;
 
-class BelongsToMany extends EloquentBelongsToMany
-{
+class BelongsToMany extends EloquentBelongsToMany {
     /**
      * Get the key for comparing against the parent key in "has" query.
      *
      * @return string
      */
-    public function getHasCompareKey()
-    {
+    public function getHasCompareKey() {
         return $this->getForeignKey();
     }
 
     /**
      * @inheritdoc
      */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
-    {
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']) {
         return $query;
     }
 
     /**
      * Hydrate the pivot table relationship on the models.
      *
-     * @param  array $models
+     * @param array $models
      */
-    protected function hydratePivotRelation(array $models)
-    {
+    protected function hydratePivotRelation(array $models) {
         // Do nothing.
     }
 
     /**
      * Set the select clause for the relation query.
      *
-     * @param  array $columns
+     * @param array $columns
      * @return array
      */
-    protected function getSelectColumns(array $columns = ['*'])
-    {
+    protected function getSelectColumns(array $columns = ['*']) {
         return $columns;
     }
 
     /**
      * @inheritdoc
      */
-    protected function shouldSelect(array $columns = ['*'])
-    {
+    protected function shouldSelect(array $columns = ['*']) {
         return $columns;
     }
 
     /**
      * Set the base constraints on the relation query.
      */
-    public function addConstraints()
-    {
+    public function addConstraints() {
         if (static::$constraints) {
             $this->setWhere();
         }
@@ -69,11 +62,10 @@ class BelongsToMany extends EloquentBelongsToMany
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param  array $models
+     * @param array $models
      * @return void
      */
-    public function addEagerConstraints(array $models)
-    {
+    public function addEagerConstraints(array $models) {
         $this->query->whereAnyIn($this->getForeignKey(), $this->getKeys($models));
     }
 
@@ -82,8 +74,7 @@ class BelongsToMany extends EloquentBelongsToMany
      *
      * @return $this
      */
-    protected function setWhere()
-    {
+    protected function setWhere() {
         $foreign = $this->getForeignKey();
 
         $this->query->whereRaw('ARRAY_CONTAINS(' . $foreign . ', "' . $this->parent->getKey() . '")');
@@ -94,13 +85,12 @@ class BelongsToMany extends EloquentBelongsToMany
     /**
      * Save a new model and attach it to the parent model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model $model
-     * @param  array $joining
-     * @param  bool $touch
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param array $joining
+     * @param bool $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function save(Model $model, array $joining = [], $touch = true)
-    {
+    public function save(Model $model, array $joining = [], $touch = true) {
         $model->save(['touch' => false]);
 
         $this->attach($model, $joining, $touch);
@@ -111,13 +101,12 @@ class BelongsToMany extends EloquentBelongsToMany
     /**
      * Create a new instance of the related model.
      *
-     * @param  array $attributes
-     * @param  array $joining
-     * @param  bool $touch
+     * @param array $attributes
+     * @param array $joining
+     * @param bool $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function create(array $attributes = [], array $joining = [], $touch = true)
-    {
+    public function create(array $attributes = [], array $joining = [], $touch = true) {
         $instance = $this->related->newInstance($attributes);
 
         // Once we save the related model, we need to attach it to the base model via
@@ -133,12 +122,11 @@ class BelongsToMany extends EloquentBelongsToMany
     /**
      * Sync the intermediate tables with a list of IDs or collection of models.
      *
-     * @param  array $ids
-     * @param  bool $detaching
+     * @param array $ids
+     * @param bool $detaching
      * @return array
      */
-    public function sync($ids, $detaching = true)
-    {
+    public function sync($ids, $detaching = true) {
         $changes = [
             'attached' => [],
             'detached' => [],
@@ -198,24 +186,22 @@ class BelongsToMany extends EloquentBelongsToMany
     /**
      * Update an existing pivot record on the table.
      *
-     * @param  mixed $id
-     * @param  array $attributes
-     * @param  bool $touch
+     * @param mixed $id
+     * @param array $attributes
+     * @param bool $touch
      */
-    public function updateExistingPivot($id, array $attributes, $touch = true)
-    {
+    public function updateExistingPivot($id, array $attributes, $touch = true) {
         // Do nothing, we have no pivot table.
     }
 
     /**
      * Attach a model to the parent.
      *
-     * @param  mixed $id
-     * @param  array $attributes
-     * @param  bool $touch
+     * @param mixed $id
+     * @param array $attributes
+     * @param bool $touch
      */
-    public function attach($id, array $attributes = [], $touch = true)
-    {
+    public function attach($id, array $attributes = [], $touch = true) {
         if ($id instanceof Model) {
             $model = $id;
 
@@ -247,12 +233,11 @@ class BelongsToMany extends EloquentBelongsToMany
     /**
      * Detach models from the relationship.
      *
-     * @param  int|array $ids
-     * @param  bool $touch
+     * @param int|array $ids
+     * @param bool $touch
      * @return int
      */
-    public function detach($ids = [], $touch = true)
-    {
+    public function detach($ids = [], $touch = true) {
         if ($ids instanceof Model) {
             $ids = (array)$ids->getKey();
         }
@@ -287,11 +272,10 @@ class BelongsToMany extends EloquentBelongsToMany
     /**
      * Build model dictionary keyed by the relation's foreign key.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection $results
+     * @param \Illuminate\Database\Eloquent\Collection $results
      * @return array
      */
-    protected function buildDictionary(Collection $results)
-    {
+    protected function buildDictionary(Collection $results) {
         $foreign = $this->foreignKey;
 
         // First we will build a dictionary of child models keyed by the foreign key
@@ -313,8 +297,7 @@ class BelongsToMany extends EloquentBelongsToMany
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function newPivotQuery()
-    {
+    protected function newPivotQuery() {
         return $this->newRelatedQuery();
     }
 
@@ -323,16 +306,14 @@ class BelongsToMany extends EloquentBelongsToMany
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    public function newRelatedQuery()
-    {
+    public function newRelatedQuery() {
         return $this->related->newQuery();
     }
 
     /**
      * @inheritdoc
      */
-    public function getQualifiedForeignKeyName()
-    {
+    public function getQualifiedForeignKeyName() {
         return $this->foreignKey;
     }
 
@@ -342,8 +323,7 @@ class BelongsToMany extends EloquentBelongsToMany
      *
      * @return string
      */
-    public function getForeignKey()
-    {
+    public function getForeignKey() {
         return $this->foreignKey;
     }
 
@@ -351,12 +331,11 @@ class BelongsToMany extends EloquentBelongsToMany
      * Format the sync list so that it is keyed by ID. (Legacy Support)
      * The original function has been renamed to formatRecordsList since Laravel 5.3
      *
-     * @deprecated
-     * @param  array $records
+     * @param array $records
      * @return array
+     * @deprecated
      */
-    protected function formatSyncList(array $records)
-    {
+    protected function formatSyncList(array $records) {
         $results = [];
         foreach ($records as $id => $attributes) {
             if (!is_array($attributes)) {

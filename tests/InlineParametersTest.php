@@ -3,10 +3,8 @@
 use Illuminate\Support\Facades\DB;
 use Mpociot\Couchbase\Events\QueryFired;
 
-class InlineParametersTest extends TestCase
-{
-    public static function setUpBeforeClass()
-    {
+class InlineParametersTest extends TestCase {
+    public static function setUpBeforeClass() {
         putenv('CB_INLINE_PARAMETERS=false');
         putenv('CB_INLINE_PARAMETERS_DEFAULT_BUCKET=true');
         parent::setUpBeforeClass();
@@ -15,8 +13,7 @@ class InlineParametersTest extends TestCase
     /**
      * @group InlineParametersTest
      */
-    public function testInlineParameters()
-    {
+    public function testInlineParameters() {
         /** @var \Mpociot\Couchbase\Query\Builder $query */
         $query = DB::table('table6')->select();
 
@@ -34,8 +31,7 @@ class InlineParametersTest extends TestCase
     /**
      * @group InlineParametersTest
      */
-    public function testInlineParametersSwitchToOff()
-    {
+    public function testInlineParametersSwitchToOff() {
         /** @var \Mpociot\Couchbase\Query\Builder $query */
         $query = DB::table('table6')->select();
 
@@ -57,8 +53,7 @@ class InlineParametersTest extends TestCase
     /**
      * @group InlineParametersTest
      */
-    public function testInlineParametersSwitchToOn()
-    {
+    public function testInlineParametersSwitchToOn() {
         DB::setInlineParameters(false);
 
         /** @var \Mpociot\Couchbase\Query\Builder $query */
@@ -81,8 +76,7 @@ class InlineParametersTest extends TestCase
     /**
      * @group InlineParametersTest
      */
-    public function testInlineParametersWhereRaw()
-    {
+    public function testInlineParametersWhereRaw() {
         DB::setInlineParameters(true);
 
         /** @var \Mpociot\Couchbase\Query\Builder $query */
@@ -109,8 +103,7 @@ class InlineParametersTest extends TestCase
      * @param string $sql
      * @return int
      */
-    private function getActualBindingsCount(string $sql)
-    {
+    private function getActualBindingsCount(string $sql) {
         $this->assertTrue(mb_strpos($sql, '$') === false,
             'Assert query does not contain \'$\', this would change the result.');
 
@@ -139,8 +132,7 @@ class InlineParametersTest extends TestCase
     /**
      * @group InlineParametersTest
      */
-    public function testApplyBindingsBasic()
-    {
+    public function testApplyBindingsBasic() {
         $this->assertEquals(0, $this->getActualBindingsCount('select 1'));
         $this->assertEquals(1, $this->getActualBindingsCount('select ?'));
         $this->assertEquals(3, $this->getActualBindingsCount('select ?, ?, ?'));
@@ -155,8 +147,7 @@ class InlineParametersTest extends TestCase
     /**
      * @group InlineParametersTest
      */
-    public function testApplyBindingsIdentifier()
-    {
+    public function testApplyBindingsIdentifier() {
         $this->assertEquals(0, $this->getActualBindingsCount('select 1 as `ident?ifier`'));
         $this->assertEquals(1, $this->getActualBindingsCount('select ? as `ident?ifier`'));
         $this->assertEquals(3,
@@ -175,8 +166,7 @@ class InlineParametersTest extends TestCase
     /**
      * @group InlineParametersTest
      */
-    public function testApplyBindingsLiteralSinglequote()
-    {
+    public function testApplyBindingsLiteralSinglequote() {
         $this->assertEquals(0, $this->getActualBindingsCount('select \'?\''));
         $this->assertEquals(1, $this->getActualBindingsCount('select \'?\', ?'));
         $this->assertEquals(3, $this->getActualBindingsCount('select \'?\', ?, \'?\', ?, \'?\', ?'));
@@ -192,8 +182,7 @@ class InlineParametersTest extends TestCase
     /**
      * @group InlineParametersTest
      */
-    public function testApplyBindingsLiteralJsonString()
-    {
+    public function testApplyBindingsLiteralJsonString() {
         $this->assertEquals(0, $this->getActualBindingsCount('select "?"'));
         $this->assertEquals(1, $this->getActualBindingsCount('select "?", ?'));
         $this->assertEquals(3, $this->getActualBindingsCount('select "?", ?, "?", ?, "?", ?'));
@@ -217,11 +206,10 @@ class InlineParametersTest extends TestCase
     /**
      * @group InlineParametersTest
      */
-    public function testApplyBindingsLiteralJson()
-    {
-        $this->assertEquals(0, $this->getActualBindingsCount('select '.json_encode(['?' => '?']).''));
-        $this->assertEquals(1, $this->getActualBindingsCount('select '.json_encode(['?' => '?']).', ?'));
-        $this->assertEquals(3, $this->getActualBindingsCount('select '.json_encode(['?' => '?']).', ?, '.json_encode(['?' => '?']).', ?, '.json_encode(['?' => '?']).', ?'));
+    public function testApplyBindingsLiteralJson() {
+        $this->assertEquals(0, $this->getActualBindingsCount('select ' . json_encode(['?' => '?']) . ''));
+        $this->assertEquals(1, $this->getActualBindingsCount('select ' . json_encode(['?' => '?']) . ', ?'));
+        $this->assertEquals(3, $this->getActualBindingsCount('select ' . json_encode(['?' => '?']) . ', ?, ' . json_encode(['?' => '?']) . ', ?, ' . json_encode(['?' => '?']) . ', ?'));
 
         $this->assertEquals(json_encode(['?' => '?']) . ' "?l" "l2" ?',
             DB::getQueryGrammar()->applyBindings(json_encode(['?' => '?']) . ' ? ? ?', ['?l', 'l2']));
@@ -242,18 +230,17 @@ class InlineParametersTest extends TestCase
     /**
      * @group InlineParametersTest
      */
-    public function testStatement()
-    {
+    public function testStatement() {
         DB::setInlineParameters(false);
         $this->assertEquals(false, DB::hasInlineParameters());
-        $this->assertQueryFiredEquals('select * from `'.DB::getBucketName().'` where eloquent_type = ? LIMIT 1', ['test'], function(){
-            DB::statement('select * from `'.DB::getBucketName().'` where eloquent_type = ? LIMIT 1', ['test']);
+        $this->assertQueryFiredEquals('select * from `' . DB::getBucketName() . '` where eloquent_type = ? LIMIT 1', ['test'], function () {
+            DB::statement('select * from `' . DB::getBucketName() . '` where eloquent_type = ? LIMIT 1', ['test']);
         });
 
         DB::setInlineParameters(true);
         $this->assertEquals(true, DB::hasInlineParameters());
-        $this->assertQueryFiredEquals('select * from `'.DB::getBucketName().'` where eloquent_type = "test" LIMIT 1', [], function(){
-            DB::statement('select * from `'.DB::getBucketName().'` where eloquent_type = ? LIMIT 1', ['test']);
+        $this->assertQueryFiredEquals('select * from `' . DB::getBucketName() . '` where eloquent_type = "test" LIMIT 1', [], function () {
+            DB::statement('select * from `' . DB::getBucketName() . '` where eloquent_type = ? LIMIT 1', ['test']);
         });
     }
 }

@@ -1,16 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: lukas.quast
- * Date: 01.03.18
- * Time: 10:52
- */
 
-namespace Mpociot\Couchbase\Events;
+namespace HuongDaOnline\Couchbase\Events;
 
-
-class QueryFired
-{
+class QueryFired {
     /** @var string */
     protected $query;
 
@@ -22,8 +14,7 @@ class QueryFired
      * @param string $query
      * @param array $options
      */
-    public function __construct(string $query, array $options)
-    {
+    public function __construct(string $query, array $options) {
         $this->query = $query;
         $this->options = $options;
     }

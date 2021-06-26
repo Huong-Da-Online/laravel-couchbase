@@ -1,24 +1,22 @@
 <?php declare(strict_types=1);
 
-namespace Mpociot\Couchbase\Relations;
+namespace HuongDaOnline\Couchbase\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany as EloquentHasMany;
 use Illuminate\Support\Arr;
 
-class HasMany extends EloquentHasMany
-{
+class HasMany extends EloquentHasMany {
 
     /**
      * Set the base constraints on the relation query.
      *
      * @return void
      */
-    public function addConstraints()
-    {
+    public function addConstraints() {
         if (static::$constraints) {
-            if($this->foreignKey === '_id') {
+            if ($this->foreignKey === '_id') {
                 $this->query->useKeys(is_array($this->getParentKey()) ? $this->getParentKey() : [$this->getParentKey()]);
             } else {
                 $this->query->where($this->foreignKey, '=', $this->getParentKey());
@@ -29,12 +27,11 @@ class HasMany extends EloquentHasMany
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param  array  $models
+     * @param array $models
      * @return void
      */
-    public function addEagerConstraints(array $models)
-    {
-        if($this->foreignKey === '_id') {
+    public function addEagerConstraints(array $models) {
+        if ($this->foreignKey === '_id') {
             $this->query->useKeys(Arr::flatten($this->getKeys($models, $this->localKey)));
         } else {
             $this->query->whereIn(
@@ -43,13 +40,11 @@ class HasMany extends EloquentHasMany
         }
     }
 
-    public function getForeignKeyName()
-    {
+    public function getForeignKeyName() {
         return $this->foreignKey;
     }
 
-    public function getPlainForeignKey()
-    {
+    public function getPlainForeignKey() {
         return $this->getForeignKeyName();
     }
 
@@ -58,16 +53,14 @@ class HasMany extends EloquentHasMany
      *
      * @return string
      */
-    public function getHasCompareKey()
-    {
+    public function getHasCompareKey() {
         return $this->getForeignKeyName();
     }
 
     /**
      * @inheritdoc
      */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
-    {
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']) {
         $foreignKey = $this->getHasCompareKey();
 
         return $query->select($foreignKey);
@@ -76,13 +69,12 @@ class HasMany extends EloquentHasMany
     /**
      * Add the constraints for a relationship query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
-     * @param  \Illuminate\Database\Eloquent\Builder $parent
-     * @param  array|mixed $columns
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param \Illuminate\Database\Eloquent\Builder $parent
+     * @param array|mixed $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
-    {
+    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*']) {
         $query->select($columns);
 
         $key = $this->wrap($this->getQualifiedParentKeyName());
@@ -97,8 +89,7 @@ class HasMany extends EloquentHasMany
      * @param string $type
      * @return array
      */
-    protected function matchOneOrMany(array $models, Collection $results, $relation, $type)
-    {
+    protected function matchOneOrMany(array $models, Collection $results, $relation, $type) {
         $dictionary = $this->buildDictionary($results);
 
         // Once we have the dictionary we can simply spin through the parent models to

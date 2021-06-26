@@ -1,9 +1,7 @@
 <?php declare(strict_types=1);
 
-class EmbeddedRelationsTest extends TestCase
-{
-    public function tearDown()
-    {
+class EmbeddedRelationsTest extends TestCase {
+    public function tearDown() {
         Mockery::close();
 
         User::truncate();
@@ -15,8 +13,7 @@ class EmbeddedRelationsTest extends TestCase
         Photo::truncate();
     }
 
-    public function testEmbedsManySave()
-    {
+    public function testEmbedsManySave() {
         $user = User::create(['name' => 'John Doe']);
         $address = new Address(['city' => 'London']);
 
@@ -88,8 +85,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals(['London', 'Manhattan', 'Bruxelles'], $freshUser->addresses->pluck('city')->all());
     }
 
-    public function testEmbedsToArray()
-    {
+    public function testEmbedsToArray() {
         $user = User::create(['name' => 'John Doe']);
         $user->addresses()->saveMany([new Address(['city' => 'London']), new Address(['city' => 'Bristol'])]);
 
@@ -98,8 +94,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertTrue(array_key_exists('addresses', $array));
     }
 
-    public function testEmbedsManyAssociate()
-    {
+    public function testEmbedsManyAssociate() {
         $user = User::create(['name' => 'John Doe']);
         $address = new Address(['city' => 'London']);
 
@@ -118,8 +113,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals([], $freshUser->addresses->pluck('city')->all());
     }
 
-    public function testEmbedsManySaveMany()
-    {
+    public function testEmbedsManySaveMany() {
         $user = User::create(['name' => 'John Doe']);
         $user->addresses()->saveMany([new Address(['city' => 'London']), new Address(['city' => 'Bristol'])]);
         $this->assertEquals(['London', 'Bristol'], $user->addresses->pluck('city')->all());
@@ -128,8 +122,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals(['London', 'Bristol'], $freshUser->addresses->pluck('city')->all());
     }
 
-    public function testEmbedsManyDuplicate()
-    {
+    public function testEmbedsManyDuplicate() {
         $user = User::create(['name' => 'John Doe']);
         $address = new Address(['city' => 'London']);
         $user->addresses()->save($address);
@@ -150,8 +143,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals(['Bruxelles'], $user->addresses->pluck('city')->all());
     }
 
-    public function testEmbedsManyCreate()
-    {
+    public function testEmbedsManyCreate() {
         $user = User::create([]);
         $address = $user->addresses()->create(['city' => 'Bruxelles']);
         $this->assertInstanceOf('Address', $address);
@@ -170,8 +162,7 @@ class EmbeddedRelationsTest extends TestCase
         $raw = $address->getAttributes();
     }
 
-    public function testEmbedsManyCreateMany()
-    {
+    public function testEmbedsManyCreateMany() {
         $user = User::create([]);
         list($bruxelles, $paris) = $user->addresses()->createMany([['city' => 'Bruxelles'], ['city' => 'Paris']]);
         $this->assertInstanceOf('Address', $bruxelles);
@@ -182,8 +173,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals(['Bruxelles', 'Paris'], $freshUser->addresses->pluck('city')->all());
     }
 
-    public function testEmbedsManyDestroy()
-    {
+    public function testEmbedsManyDestroy() {
         $user = User::create(['name' => 'John Doe']);
         $user->addresses()->saveMany([
             new Address(['city' => 'London']),
@@ -230,8 +220,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals(['Bristol'], $user->addresses->pluck('city')->all());
     }
 
-    public function testEmbedsManyDelete()
-    {
+    public function testEmbedsManyDelete() {
         $user = User::create(['name' => 'John Doe']);
         $user->addresses()->saveMany([
             new Address(['city' => 'London']),
@@ -262,8 +251,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals(1, $user->addresses->count());
     }
 
-    public function testEmbedsManyDissociate()
-    {
+    public function testEmbedsManyDissociate() {
         $user = User::create([]);
         $cordoba = $user->addresses()->create(['city' => 'Cordoba']);
 
@@ -274,8 +262,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals(1, $freshUser->addresses->count());
     }
 
-    public function testEmbedsManyAliases()
-    {
+    public function testEmbedsManyAliases() {
         $user = User::create(['name' => 'John Doe']);
         $address = new Address(['city' => 'London']);
 
@@ -286,8 +273,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals([], $user->addresses->pluck('city')->all());
     }
 
-    public function testEmbedsManyCreatingEventReturnsFalse()
-    {
+    public function testEmbedsManyCreatingEventReturnsFalse() {
         $user = User::create(['name' => 'John Doe']);
         $address = new Address(['city' => 'London']);
 
@@ -301,8 +287,7 @@ class EmbeddedRelationsTest extends TestCase
         $address->unsetEventDispatcher();
     }
 
-    public function testEmbedsManySavingEventReturnsFalse()
-    {
+    public function testEmbedsManySavingEventReturnsFalse() {
         $user = User::create(['name' => 'John Doe']);
         $address = new Address(['city' => 'Paris']);
         $address->exists = true;
@@ -315,8 +300,7 @@ class EmbeddedRelationsTest extends TestCase
         $address->unsetEventDispatcher();
     }
 
-    public function testEmbedsManyUpdatingEventReturnsFalse()
-    {
+    public function testEmbedsManyUpdatingEventReturnsFalse() {
         $user = User::create(['name' => 'John Doe']);
         $address = new Address(['city' => 'New York']);
         $user->addresses()->save($address);
@@ -333,8 +317,7 @@ class EmbeddedRelationsTest extends TestCase
         $address->unsetEventDispatcher();
     }
 
-    public function testEmbedsManyDeletingEventReturnsFalse()
-    {
+    public function testEmbedsManyDeletingEventReturnsFalse() {
         $user = User::create(['name' => 'John Doe']);
         $user->addresses()->save(new Address(['city' => 'New York']));
 
@@ -350,8 +333,7 @@ class EmbeddedRelationsTest extends TestCase
         $address->unsetEventDispatcher();
     }
 
-    public function testEmbedsManyFindOrContains()
-    {
+    public function testEmbedsManyFindOrContains() {
         $user = User::create(['name' => 'John Doe']);
         $address1 = $user->addresses()->save(new Address(['city' => 'New York']));
         $address2 = $user->addresses()->save(new Address(['city' => 'Paris']));
@@ -366,8 +348,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertFalse($user->addresses()->contains('123'));
     }
 
-    public function testEmbedsManyEagerLoading()
-    {
+    public function testEmbedsManyEagerLoading() {
         $user1 = User::create(['name' => 'John Doe']);
         $user1->addresses()->save(new Address(['city' => 'New York']));
         $user1->addresses()->save(new Address(['city' => 'Paris']));
@@ -390,8 +371,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertTrue(is_array($user->toArray()['addresses']));
     }
 
-    public function testEmbedsManyDeleteAll()
-    {
+    public function testEmbedsManyDeleteAll() {
         $user1 = User::create(['name' => 'John Doe']);
         $user1->addresses()->save(new Address(['city' => 'New York']));
         $user1->addresses()->save(new Address(['city' => 'Paris']));
@@ -414,8 +394,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals(2, $user2->addresses->count());
     }
 
-    public function testEmbedsManyCollectionMethods()
-    {
+    public function testEmbedsManyCollectionMethods() {
         $user = User::create(['name' => 'John Doe']);
         $user->addresses()->save(new Address([
             'city' => 'Paris',
@@ -462,8 +441,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals(2, $results->count());
     }
 
-    public function testEmbedsOne()
-    {
+    public function testEmbedsOne() {
         $user = User::create(['name' => 'John Doe']);
         $father = new User(['name' => 'Mark Doe']);
 
@@ -519,8 +497,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals('Jim Doe', $user->father->name);
     }
 
-    public function testEmbedsOneAssociate()
-    {
+    public function testEmbedsOneAssociate() {
         $user = User::create(['name' => 'John Doe']);
         $father = new User(['name' => 'Mark Doe']);
 
@@ -534,14 +511,12 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals('Mark Doe', $user->father->name);
     }
 
-    public function testEmbedsOneNullAssociation()
-    {
+    public function testEmbedsOneNullAssociation() {
         $user = User::create();
         $this->assertNull($user->father);
     }
 
-    public function testEmbedsOneDelete()
-    {
+    public function testEmbedsOneDelete() {
         $user = User::create(['name' => 'John Doe']);
         $father = $user->father()->save(new User(['name' => 'Mark Doe']));
 
@@ -549,8 +524,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertNull($user->father);
     }
 
-    public function testEmbedsManyToArray()
-    {
+    public function testEmbedsManyToArray() {
         $user = User::create(['name' => 'John Doe']);
         $user->addresses()->save(new Address(['city' => 'New York']));
         $user->addresses()->save(new Address(['city' => 'Paris']));
@@ -561,8 +535,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertTrue(is_array($array['addresses']));
     }
 
-    public function testEmbeddedSave()
-    {
+    public function testEmbeddedSave() {
         $user = User::create(['name' => 'John Doe']);
         $address = $user->addresses()->create(['city' => 'New York']);
         $father = $user->father()->create(['name' => 'Mark Doe']);
@@ -597,8 +570,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals('Mark Doe', $user->father->name);
     }
 
-    public function testNestedEmbedsOne()
-    {
+    public function testNestedEmbedsOne() {
         $user = User::create(['name' => 'John Doe']);
         $father = $user->father()->create(['name' => 'Mark Doe']);
         $grandfather = $father->father()->create(['name' => 'Steve Doe']);
@@ -625,8 +597,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals('Ron Doe', $user->father->father->father->name);
     }
 
-    public function testDoubleAssociate()
-    {
+    public function testDoubleAssociate() {
         $user = User::create(['name' => 'John Doe']);
         $address = new Address(['city' => 'Paris']);
 
@@ -645,16 +616,14 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals(1, $user->addresses()->count());
     }
 
-    public function testSaveEmptyModel()
-    {
+    public function testSaveEmptyModel() {
         $user = User::create(['name' => 'John Doe']);
         $user->addresses()->save(new Address);
         $this->assertNotNull($user->addresses);
         $this->assertEquals(1, $user->addresses()->count());
     }
 
-    public function testIncrementEmbedded()
-    {
+    public function testIncrementEmbedded() {
         $user = User::create(['name' => 'John Doe']);
         $address = $user->addresses()->create(['city' => 'New York', 'visited' => 5]);
 
@@ -676,8 +645,7 @@ class EmbeddedRelationsTest extends TestCase
         $this->assertEquals(5, $user->addresses()->first()->visited);
     }
 
-    public function testPaginateEmbedsMany()
-    {
+    public function testPaginateEmbedsMany() {
         $user = User::create(['name' => 'John Doe']);
         $user->addresses()->save(new Address(['city' => 'New York']));
         $user->addresses()->save(new Address(['city' => 'Paris']));

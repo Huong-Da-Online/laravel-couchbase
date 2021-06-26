@@ -3,13 +3,11 @@
 use Mpociot\Couchbase\Query\Builder as Query;
 use Mpociot\Couchbase\Query\Grammar;
 
-class QueryBuilderTest extends TestCase
-{
+class QueryBuilderTest extends TestCase {
     /**
      * @group QueryBuilderTest
      */
-    public function tearDown()
-    {
+    public function tearDown() {
         DB::connection('couchbase-not-default')->table('users')->truncate();
         DB::connection('couchbase-not-default')->table('items')->truncate();
     }
@@ -17,16 +15,14 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testCollection()
-    {
+    public function testCollection() {
         $this->assertInstanceOf('Mpociot\Couchbase\Query\Builder', DB::connection('couchbase-not-default')->table('users'));
     }
 
     /**
      * @group QueryBuilderTest
      */
-    public function testGet()
-    {
+    public function testGet() {
         $users = DB::connection('couchbase-not-default')->table('users')->get();
         $this->assertEquals(0, count($users));
 
@@ -39,8 +35,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testNoDocument()
-    {
+    public function testNoDocument() {
         $items = DB::connection('couchbase-not-default')->table('items')->where('name', 'nothing')->get()->toArray();
         $this->assertEquals([], $items);
 
@@ -54,8 +49,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testInsert()
-    {
+    public function testInsert() {
         DB::connection('couchbase-not-default')->table('users')->useKeys('users::tags')->insert([
             'tags' => ['tag1', 'tag2'],
             'name' => 'John Doe',
@@ -72,8 +66,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testGetUnderscoreId()
-    {
+    public function testGetUnderscoreId() {
         $id = 'foobar.' . uniqid();
         DB::connection('couchbase-not-default')->table('users')->useKeys($id)->insert(['name' => 'John Doe']);
         $this->assertArrayHasKey('_id', DB::connection('couchbase-not-default')->table('users')->useKeys($id)->first());
@@ -83,8 +76,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testInsertGetId()
-    {
+    public function testInsertGetId() {
         $id = DB::connection('couchbase-not-default')->table('users')->insertGetId(['name' => 'John Doe']);
         $this->assertTrue(is_string($id));
         $this->assertSame($id, DB::connection('couchbase-not-default')->table('users')->useKeys($id)->first()['_id']);
@@ -97,8 +89,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testBatchInsert()
-    {
+    public function testBatchInsert() {
         DB::connection('couchbase-not-default')->table('users')->useKeys('batch')->insert([
             [
                 'tags' => ['tag1', 'tag2'],
@@ -120,8 +111,7 @@ class QueryBuilderTest extends TestCase
      * @group QueryBuilderTest
      * @group testFind
      */
-    public function testFind()
-    {
+    public function testFind() {
         $id = 'my_id';
         DB::connection('couchbase-not-default')->table('users')->useKeys($id)->insert(['name' => 'John Doe']);
 
@@ -132,8 +122,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testFindNull()
-    {
+    public function testFindNull() {
         $user = DB::connection('couchbase-not-default')->table('users')->find(null);
         $this->assertEquals(null, $user);
     }
@@ -141,8 +130,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testCount()
-    {
+    public function testCount() {
         DB::connection('couchbase-not-default')->table('users')->useKeys('users.1')->insert(['name' => 'Jane Doe']);
         DB::connection('couchbase-not-default')->table('users')->useKeys('users.2')->insert(['name' => 'Jane Doe']);
 
@@ -152,8 +140,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testUpdate()
-    {
+    public function testUpdate() {
 
         DB::connection('couchbase-not-default')->table('users')->useKeys('users.1')->insert(['name' => 'John Doe', 'age' => 30]);
         DB::connection('couchbase-not-default')->table('users')->useKeys('users.2')->insert(['name' => 'Jane Doe', 'age' => 20]);
@@ -170,8 +157,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testDelete()
-    {
+    public function testDelete() {
 
         DB::connection('couchbase-not-default')->table('users')->useKeys('users.1')->insert(['name' => 'John Doe', 'age' => 25]);
         DB::connection('couchbase-not-default')->table('users')->useKeys('users.2')->insert(['name' => 'Jane Doe', 'age' => 20]);
@@ -186,8 +172,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testTruncate()
-    {
+    public function testTruncate() {
         DB::connection('couchbase-not-default')->table('users')->useKeys('john')->insert(['name' => 'John Doe']);
         DB::connection('couchbase-not-default')->table('users')->truncate();
         $this->assertEquals(0, DB::connection('couchbase-not-default')->table('users')->count());
@@ -196,8 +181,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testSubKey()
-    {
+    public function testSubKey() {
         DB::connection('couchbase-not-default')->table('users')->useKeys('users.1')->insert([
             'name' => 'John Doe',
             'address' => ['country' => 'Belgium', 'city' => 'Ghent'],
@@ -215,8 +199,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testInArray()
-    {
+    public function testInArray() {
         DB::connection('couchbase-not-default')->table('items')->useKeys('items.1')->insert([
             'tags' => ['tag1', 'tag2', 'tag3', 'tag4'],
         ]);
@@ -234,8 +217,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testDistinct()
-    {
+    public function testDistinct() {
         DB::connection('couchbase-not-default')->table('items')->useKeys('item:1')->insert(['name' => 'knife', 'type' => 'sharp']);
         DB::connection('couchbase-not-default')->table('items')->useKeys('item:2')->insert(['name' => 'fork', 'type' => 'sharp']);
         DB::connection('couchbase-not-default')->table('items')->useKeys('item:3')->insert(['name' => 'spoon', 'type' => 'round']);
@@ -255,8 +237,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testTake()
-    {
+    public function testTake() {
 
         DB::connection('couchbase-not-default')->table('items')->useKeys('item.' . uniqid())->insert(['name' => 'knife', 'type' => 'sharp', 'amount' => 34]);
         DB::connection('couchbase-not-default')->table('items')->useKeys('item.' . uniqid())->insert(['name' => 'fork', 'type' => 'sharp', 'amount' => 20]);
@@ -271,8 +252,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testSkip()
-    {
+    public function testSkip() {
         DB::connection('couchbase-not-default')->table('items')->useKeys('item.' . uniqid())->insert(['name' => 'knife', 'type' => 'sharp', 'amount' => 34]);
         DB::connection('couchbase-not-default')->table('items')->useKeys('item.' . uniqid())->insert(['name' => 'fork', 'type' => 'sharp', 'amount' => 20]);
         DB::connection('couchbase-not-default')->table('items')->useKeys('item.' . uniqid())->insert(['name' => 'spoon', 'type' => 'round', 'amount' => 3]);
@@ -286,8 +266,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testPluck()
-    {
+    public function testPluck() {
         DB::connection('couchbase-not-default')->table('users')->useKeys('user.1')->insert(['name' => 'Jane Doe', 'age' => 20]);
         DB::connection('couchbase-not-default')->table('users')->useKeys('user.2')->insert(['name' => 'John Doe', 'age' => 25]);
 
@@ -298,8 +277,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testList()
-    {
+    public function testList() {
 
         DB::connection('couchbase-not-default')->table('items')->useKeys('item.' . uniqid())->insert(['name' => 'knife', 'type' => 'sharp', 'amount' => 34]);
         DB::connection('couchbase-not-default')->table('items')->useKeys('item.' . uniqid())->insert(['name' => 'fork', 'type' => 'sharp', 'amount' => 20]);
@@ -323,8 +301,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testAggregate()
-    {
+    public function testAggregate() {
 
         DB::connection('couchbase-not-default')->table('items')->useKeys('item.' . uniqid())->insert(['name' => 'knife', 'type' => 'sharp', 'amount' => 34]);
         DB::connection('couchbase-not-default')->table('items')->useKeys('item.' . uniqid())->insert(['name' => 'fork', 'type' => 'sharp', 'amount' => 20]);
@@ -344,8 +321,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testSubdocumentAggregate()
-    {
+    public function testSubdocumentAggregate() {
         DB::connection('couchbase-not-default')->table('items')->insert([
             ['name' => 'knife', 'amount' => ['hidden' => 10, 'found' => 3]],
             ['name' => 'fork', 'amount' => ['hidden' => 35, 'found' => 12]],
@@ -363,8 +339,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testUnset()
-    {
+    public function testUnset() {
         $id1 = DB::connection('couchbase-not-default')->table('users')->insertGetId(['name' => 'John Doe', 'note1' => 'ABC', 'note2' => 'DEF']);
         $id2 = DB::connection('couchbase-not-default')->table('users')->insertGetId(['name' => 'Jane Doe', 'note1' => 'ABC', 'note2' => 'DEF']);
 
@@ -389,8 +364,7 @@ class QueryBuilderTest extends TestCase
      * @group QueryBuilderTest
      * @group testUpdateSubdocument
      */
-    public function testUpdateSubdocument()
-    {
+    public function testUpdateSubdocument() {
         $id = DB::connection('couchbase-not-default')->table('users')->insertGetId(['name' => 'John Doe', 'address' => ['country' => 'Belgium']]);
 
         DB::connection('couchbase-not-default')->table('users')->useKeys($id)->update(['address.country' => 'England']);
@@ -402,8 +376,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testIncrement()
-    {
+    public function testIncrement() {
         DB::connection('couchbase-not-default')->table('users')->insert([
             ['name' => 'John Doe', 'age' => 30, 'note' => 'adult'],
             ['name' => 'Jane Doe', 'age' => 10, 'note' => 'minor'],
@@ -452,8 +425,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testWhere()
-    {
+    public function testWhere() {
         /** @var Query $query */
         $query = DB::connection('couchbase-not-default')->table('table1')->where('a', '=', 'b');
         $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table1" and `a` = "b"',
@@ -463,8 +435,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testWhereWithTwoParameters()
-    {
+    public function testWhereWithTwoParameters() {
         /** @var Query $query */
         $query = DB::connection('couchbase-not-default')->table('table2')->where('a', 'b');
         $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table2" and `a` = "b"',
@@ -474,8 +445,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testNestedWhere()
-    {
+    public function testNestedWhere() {
         /** @var Query $query */
         $query = DB::connection('couchbase-not-default')->table('table3')->where(function (Query $query) {
             $query->where('a', 'b');
@@ -487,8 +457,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testDictWhere()
-    {
+    public function testDictWhere() {
         /** @var Query $query */
         $query = DB::connection('couchbase-not-default')->table('table4')->where(['a' => 'b']);
         $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table4" and (`a` = "b")',
@@ -501,8 +470,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testWhereColumnPreservedWord()
-    {
+    public function testWhereColumnPreservedWord() {
         /** @var Query $query */
         $query = DB::connection('couchbase-not-default')->table('table6')->where('password', 'foobar');
         $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table6" and `password` = "foobar"',
@@ -512,8 +480,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testWhereEscapedColumn()
-    {
+    public function testWhereEscapedColumn() {
         /** @var Query $query */
         $query = DB::connection('couchbase-not-default')->table('table6')->where('`foo`', 'bar');
         $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table6" and `foo` = "bar"',
@@ -523,8 +490,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testWhereEscapedColumnWithBacktick()
-    {
+    public function testWhereEscapedColumnWithBacktick() {
         $query = DB::connection('couchbase-not-default')->table('table6')->where('`foo`bar`', 'bar');
         $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table6" and `foo``bar` = "bar"',
             $this->queryToSql($query));
@@ -533,8 +499,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testWhereColumnWithBacktickEnd()
-    {
+    public function testWhereColumnWithBacktickEnd() {
         $query = DB::connection('couchbase-not-default')->table('table6')->where('foo`', 'bar');
         $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table6" and `foo``` = "bar"',
             $this->queryToSql($query));
@@ -543,8 +508,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testWhereColumnWithBacktickInside()
-    {
+    public function testWhereColumnWithBacktickInside() {
         $query = DB::connection('couchbase-not-default')->table('table6')->where('foo`bar', 'bar');
         $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table6" and `foo``bar` = "bar"',
             $this->queryToSql($query));
@@ -553,8 +517,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testWhereColumnWithBacktickBeginning()
-    {
+    public function testWhereColumnWithBacktickBeginning() {
         $query = DB::connection('couchbase-not-default')->table('table6')->where('`foo', 'bar');
         $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table6" and ```foo` = "bar"',
             $this->queryToSql($query));
@@ -563,8 +526,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testWhereColumnWithBrackets()
-    {
+    public function testWhereColumnWithBrackets() {
         $query = DB::connection('couchbase-not-default')->table('table6')->where('foo(abc)', 'foobar');
         $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table6" and `foo(abc)` = "foobar"',
             $this->queryToSql($query));
@@ -573,8 +535,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testWhereColumnUnderscoreId()
-    {
+    public function testWhereColumnUnderscoreId() {
         $query = DB::connection('couchbase-not-default')->table('table6')->where('_id', 'foobar');
         $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table6" and meta(`' . $query->from . '`).`id` = "foobar"',
             $this->queryToSql($query));
@@ -583,8 +544,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testWhereNestedRaw()
-    {
+    public function testWhereNestedRaw() {
         $query = DB::connection('couchbase-not-default')->table('table6')->where(function ($query) {
             $query->whereRaw('meta().id = "abc"')
                 ->orWhere(DB::raw('substr(`a`, 0, 3)'), "def");
@@ -596,8 +556,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testWhereDeepNestedRaw()
-    {
+    public function testWhereDeepNestedRaw() {
         $query = DB::connection('couchbase-not-default')->table('table6')->where(function ($query) {
             $query->whereRaw('meta().id = "abc"')
                 ->orWhere(function ($query) {
@@ -612,8 +571,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testSelectColumnWithAs()
-    {
+    public function testSelectColumnWithAs() {
         $query = DB::connection('couchbase-not-default')->table('table6')->select('foo as bar');
         $this->assertEquals('select `foo` as `bar` from `' . $query->from . '` where `eloquent_type` = "table6"',
             $this->queryToSql($query));
@@ -622,8 +580,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testSelectColumnMetaId()
-    {
+    public function testSelectColumnMetaId() {
         $query = DB::connection('couchbase-not-default')->table('table6')->select(DB::raw('meta().id as _id'));
         $this->assertEquals('select meta().id as _id from `' . $query->from . '` where `eloquent_type` = "table6"',
             $this->queryToSql($query));
@@ -632,8 +589,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testSelectColumnUnderscoreId()
-    {
+    public function testSelectColumnUnderscoreId() {
         $query = DB::connection('couchbase-not-default')->table('table6')->select('_id');
         $this->assertEquals('select meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table6"',
             $this->queryToSql($query));
@@ -642,8 +598,7 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testSelectColumnStar()
-    {
+    public function testSelectColumnStar() {
         $query = DB::connection('couchbase-not-default')->table('table6')->select();
         $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table6"',
             $this->queryToSql($query));
@@ -660,22 +615,20 @@ class QueryBuilderTest extends TestCase
     /**
      * @group QueryBuilderTest
      */
-    public function testUseIndex()
-    {
+    public function testUseIndex() {
         $query = DB::connection('couchbase-not-default')->table('table6')->useIndex('test-index')->select();
-        $this->assertEquals('select `'.$query->from.'`.*, meta(`'.$query->from.'`).`id` as `_id` from `' . $query->from . '` USE INDEX (`test-index` USING GSI) where `eloquent_type` = "table6"',
+        $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` USE INDEX (`test-index` USING GSI) where `eloquent_type` = "table6"',
             $this->queryToSql($query));
 
         $query = DB::connection('couchbase-not-default')->table('table6')->useIndex('test-index', Grammar::INDEX_TYPE_VIEW)->select();
-        $this->assertEquals('select `'.$query->from.'`.*, meta(`'.$query->from.'`).`id` as `_id` from `' . $query->from . '` USE INDEX (`test-index` USING VIEW) where `eloquent_type` = "table6"',
+        $this->assertEquals('select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` USE INDEX (`test-index` USING VIEW) where `eloquent_type` = "table6"',
             $this->queryToSql($query));
     }
 
     /**
      * @group QueryBuilderTest
      */
-    public function testWhereAnyIn()
-    {
+    public function testWhereAnyIn() {
         $query = DB::connection('couchbase-not-default')->table('table6')->whereAnyIn('user_ids', ['123', '456']);
         $sql = $this->queryToSql($query);
         $this->assertEquals(1, preg_match('/ANY `([a-zA-Z0-9]+)`/', $sql, $match));
@@ -688,8 +641,7 @@ class QueryBuilderTest extends TestCase
      * @param Query $query
      * @return string
      */
-    private function queryToSql(Query $query)
-    {
+    private function queryToSql(Query $query) {
         return str_replace_array('?', array_map(function ($value) {
             return Grammar::wrapData($value);
         }, $query->getBindings()), $query->toSql());

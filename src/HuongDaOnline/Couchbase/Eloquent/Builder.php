@@ -1,15 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
-namespace Mpociot\Couchbase\Eloquent;
+namespace HuongDaOnline\Couchbase\Eloquent;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
-use Mpociot\Couchbase\Query\Builder as QueryBuilder;
+use HuongDaOnline\Couchbase\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Builder as BaseQueryBuilder;
 
-class Builder extends EloquentBuilder
-{
+class Builder extends EloquentBuilder {
     /**
      * The methods that should be returned from query builder.
      *
@@ -36,14 +36,13 @@ class Builder extends EloquentBuilder
     /**
      * Create a new Eloquent query builder instance.
      *
-     * @param  BaseQueryBuilder $query
-     * @throws \Exception
+     * @param BaseQueryBuilder $query
      * @return void
+     * @throws \Exception
      */
-    public function __construct(BaseQueryBuilder $query)
-    {
-        if(!($query instanceof QueryBuilder)) {
-            throw new \Exception('Argument 1 passed to '.get_class($this).'::__construct() must be an instance of '.QueryBuilder::class.', instance of '.get_class($query).' given.');
+    public function __construct(BaseQueryBuilder $query) {
+        if (!($query instanceof QueryBuilder)) {
+            throw new \Exception('Argument 1 passed to ' . get_class($this) . '::__construct() must be an instance of ' . QueryBuilder::class . ', instance of ' . get_class($query) . ' given.');
         }
         parent::__construct($query);
     }
@@ -51,12 +50,11 @@ class Builder extends EloquentBuilder
     /**
      * Update a record in the database.
      *
-     * @param  array $values
-     * @param  array $options
+     * @param array $values
+     * @param array $options
      * @return int
      */
-    public function update(array $values, array $options = [])
-    {
+    public function update(array $values, array $options = []) {
         // Intercept operations on embedded models and delegate logic
         // to the parent relation instance.
         if ($relation = $this->model->getParentRelation()) {
@@ -71,11 +69,10 @@ class Builder extends EloquentBuilder
     /**
      * Insert a new record into the database.
      *
-     * @param  array $values
+     * @param array $values
      * @return bool
      */
-    public function insert(array $values)
-    {
+    public function insert(array $values) {
         // Intercept operations on embedded models and delegate logic
         // to the parent relation instance.
         if ($relation = $this->model->getParentRelation()) {
@@ -90,16 +87,15 @@ class Builder extends EloquentBuilder
     /**
      * Paginate the given query.
      *
-     * @param  int $perPage
-     * @param  array $columns
-     * @param  string $pageName
-     * @param  int|null $page
+     * @param int $perPage
+     * @param array $columns
+     * @param string $pageName
+     * @param int|null $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      *
      * @throws \InvalidArgumentException
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
-    {
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
@@ -143,12 +139,11 @@ class Builder extends EloquentBuilder
     /**
      * Insert a new record and get the value of the primary key.
      *
-     * @param  array $values
-     * @param  string $sequence
+     * @param array $values
+     * @param string $sequence
      * @return int
      */
-    public function insertGetId(array $values, $sequence = null)
-    {
+    public function insertGetId(array $values, $sequence = null) {
         // Intercept operations on embedded models and delegate logic
         // to the parent relation instance.
         if ($relation = $this->model->getParentRelation()) {
@@ -165,8 +160,7 @@ class Builder extends EloquentBuilder
      *
      * @return mixed
      */
-    public function delete()
-    {
+    public function delete() {
         // Intercept operations on embedded models and delegate logic
         // to the parent relation instance.
         if ($relation = $this->model->getParentRelation()) {
@@ -181,13 +175,12 @@ class Builder extends EloquentBuilder
     /**
      * Increment a column's value by a given amount.
      *
-     * @param  string $column
-     * @param  int $amount
-     * @param  array $extra
+     * @param string $column
+     * @param int $amount
+     * @param array $extra
      * @return int
      */
-    public function increment($column, $amount = 1, array $extra = [])
-    {
+    public function increment($column, $amount = 1, array $extra = []) {
         // Intercept operations on embedded models and delegate logic
         // to the parent relation instance.
         if ($relation = $this->model->getParentRelation()) {
@@ -211,13 +204,12 @@ class Builder extends EloquentBuilder
     /**
      * Decrement a column's value by a given amount.
      *
-     * @param  string $column
-     * @param  int $amount
-     * @param  array $extra
+     * @param string $column
+     * @param int $amount
+     * @param array $extra
      * @return int
      */
-    public function decrement($column, $amount = 1, array $extra = [])
-    {
+    public function decrement($column, $amount = 1, array $extra = []) {
         // Intercept operations on embedded models and delegate logic
         // to the parent relation instance.
         if ($relation = $this->model->getParentRelation()) {
@@ -239,11 +231,10 @@ class Builder extends EloquentBuilder
     /**
      * Add a where clause on the primary key to the query.
      *
-     * @param  mixed $id
+     * @param mixed $id
      * @return $this
      */
-    public function whereKey($id)
-    {
+    public function whereKey($id) {
         $this->query->useKeys($id);
 
         return $this;
@@ -252,14 +243,13 @@ class Builder extends EloquentBuilder
     /**
      * Add a basic where clause to the query.
      *
-     * @param  string|\Closure $column
-     * @param  string $operator
-     * @param  mixed $value
-     * @param  string $boolean
+     * @param string|\Closure $column
+     * @param string $operator
+     * @param mixed $value
+     * @param string $boolean
      * @return $this
      */
-    public function where($column, $operator = null, $value = null, $boolean = 'and')
-    {
+    public function where($column, $operator = null, $value = null, $boolean = 'and') {
         if ($column === $this->model->getKeyName() || $column === '_id') {
             $value = func_num_args() == 2 ? $operator : $value;
             $this->whereKey($value);
@@ -271,19 +261,18 @@ class Builder extends EloquentBuilder
     /**
      * Add the "has" condition where clause to the query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $hasQuery
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation $relation
-     * @param  string $operator
-     * @param  int $count
-     * @param  string $boolean
+     * @param \Illuminate\Database\Eloquent\Builder $hasQuery
+     * @param \Illuminate\Database\Eloquent\Relations\Relation $relation
+     * @param string $operator
+     * @param int $count
+     * @param string $boolean
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function addHasWhere(EloquentBuilder $hasQuery, Relation $relation, $operator, $count, $boolean)
-    {
+    protected function addHasWhere(EloquentBuilder $hasQuery, Relation $relation, $operator, $count, $boolean) {
         $query = $hasQuery->getQuery();
 
         // Get the number of related objects for each possible parent.
-        $relations = $query->pluck($relation->getHasCompareKey())->filter(function($value){
+        $relations = $query->pluck($relation->getHasCompareKey())->filter(function ($value) {
             return $value !== null && $value !== '';
         });
         $relationCount = array_count_values(array_map(function ($id) {
@@ -328,11 +317,10 @@ class Builder extends EloquentBuilder
     /**
      * Create a raw database expression.
      *
-     * @param  closure $expression
+     * @param closure $expression
      * @return mixed
      */
-    public function raw($expression = null)
-    {
+    public function raw($expression = null) {
         // Get raw results from the query builder.
         $results = $this->query->raw($expression);
 

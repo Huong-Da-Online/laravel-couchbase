@@ -3,16 +3,13 @@
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Foundation\Application;
 
-class AuthTest extends TestCase
-{
-    public function tearDown()
-    {
+class AuthTest extends TestCase {
+    public function tearDown() {
         User::truncate();
         DB::table('password_reminders')->truncate();
     }
 
-    public function testAuthAttempt()
-    {
+    public function testAuthAttempt() {
         $user = User::create([
             'name' => 'John Doe',
             'email' => 'john@doe.com',

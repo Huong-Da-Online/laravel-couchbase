@@ -2,17 +2,15 @@
 
 use Mpociot\Couchbase\Events\QueryFired;
 
-class TestCase extends Orchestra\Testbench\TestCase
-{
+class TestCase extends Orchestra\Testbench\TestCase {
 
     /**
      * Get package providers.
      *
-     * @param  \Illuminate\Foundation\Application $app
+     * @param \Illuminate\Foundation\Application $app
      * @return array
      */
-    protected function getPackageProviders($app)
-    {
+    protected function getPackageProviders($app) {
         return [
             Mpociot\Couchbase\CouchbaseServiceProvider::class,
         ];
@@ -21,11 +19,10 @@ class TestCase extends Orchestra\Testbench\TestCase
     /**
      * Define environment setup.
      *
-     * @param  Illuminate\Foundation\Application $app
+     * @param Illuminate\Foundation\Application $app
      * @return void
      */
-    protected function getEnvironmentSetUp($app)
-    {
+    protected function getEnvironmentSetUp($app) {
         // reset base path to point to our package's src directory
         //$app['path.base'] = __DIR__ . '/../src';
 
@@ -62,8 +59,7 @@ class TestCase extends Orchestra\Testbench\TestCase
         });
     }
 
-    protected function assertEventListenFirst($event, $callback)
-    {
+    protected function assertEventListenFirst($event, $callback) {
         $fired = false;
         $firedEvent = null;
 
@@ -84,8 +80,7 @@ class TestCase extends Orchestra\Testbench\TestCase
         return $firedEvent;
     }
 
-    protected function assertQueryFiredEquals($n1ql, $bindings, $callback)
-    {
+    protected function assertQueryFiredEquals($n1ql, $bindings, $callback) {
         /** @var QueryFired $event */
         $event = $this->assertEventListenFirst(QueryFired::class, $callback);
 
@@ -95,8 +90,7 @@ class TestCase extends Orchestra\Testbench\TestCase
         }
     }
 
-    protected function assertSelectSqlEquals($queryBuilder, $n1ql, $bindings = null)
-    {
+    protected function assertSelectSqlEquals($queryBuilder, $n1ql, $bindings = null) {
         $this->assertQueryFiredEquals($n1ql, $bindings, function () use ($queryBuilder) {
             $queryBuilder->get();
         });
@@ -106,8 +100,7 @@ class TestCase extends Orchestra\Testbench\TestCase
      * @param callable $callback
      * @param string $expectedExceptionClass
      */
-    public function assertException($callback, $expectedExceptionClass)
-    {
+    public function assertException($callback, $expectedExceptionClass) {
         $thrownExceptionClass = null;
         try {
             $callback();
@@ -123,8 +116,7 @@ class TestCase extends Orchestra\Testbench\TestCase
      * @param int $severity
      * @param null $messageRegex
      */
-    public function assertErrorException($callback, $severity, $messageRegex = null)
-    {
+    public function assertErrorException($callback, $severity, $messageRegex = null) {
         $thrownExceptionClass = null;
         try {
             $callback();

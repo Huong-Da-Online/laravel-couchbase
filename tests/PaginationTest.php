@@ -1,9 +1,7 @@
 <?php declare(strict_types=1);
 
-class PaginationTest extends TestCase
-{
-    public function tearDown()
-    {
+class PaginationTest extends TestCase {
+    public function tearDown() {
         User::truncate();
         parent::tearDown();
     }
@@ -11,8 +9,7 @@ class PaginationTest extends TestCase
     /**
      * @group PaginationTest
      */
-    public function testAll()
-    {
+    public function testAll() {
         DB::connection('couchbase-not-default')->table('users')->delete();
 
         DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 1', 'abc' => 1]);
@@ -31,8 +28,7 @@ class PaginationTest extends TestCase
     /**
      * @group PaginationTest
      */
-    public function testWhere()
-    {
+    public function testWhere() {
         DB::connection('couchbase-not-default')->table('users')->delete();
 
         DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 1', 'abc' => 1]);
@@ -51,8 +47,7 @@ class PaginationTest extends TestCase
     /**
      * @group PaginationTest
      */
-    public function testOrderBy()
-    {
+    public function testOrderBy() {
         DB::connection('couchbase-not-default')->table('users')->delete();
 
         DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 1', 'abc' => 1]);

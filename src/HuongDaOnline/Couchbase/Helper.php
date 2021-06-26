@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: sascha.presnac
@@ -6,15 +7,13 @@
  * Time: 13:23
  */
 
-namespace Mpociot\Couchbase;
+namespace HuongDaOnline\Couchbase;
 
 
-class Helper
-{
+class Helper {
     const TYPE_NAME = 'eloquent_type';
 
-    public static function getUniqueId($praefix = null)
-    {
+    public static function getUniqueId($praefix = null) {
         return (($praefix !== null) ? $praefix . '::' : '') . uniqid();
     }
 }

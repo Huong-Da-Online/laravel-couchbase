@@ -1,12 +1,10 @@
 <?php declare(strict_types=1);
 
-class RelationsTest extends TestCase
-{
+class RelationsTest extends TestCase {
     /**
      * @group RelationsTest
      */
-    public function tearDown()
-    {
+    public function tearDown() {
         Mockery::close();
 
         User::truncate();
@@ -23,8 +21,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testHasMany()
-    {
+    public function testHasMany() {
         $author = User::create(['name' => 'George R. R. Martin']);
         Book::create(['title' => 'A Game of Thrones', 'author_id' => $author->_id]);
         Book::create(['title' => 'A Clash of Kings', 'author_id' => $author->_id]);
@@ -46,8 +43,7 @@ class RelationsTest extends TestCase
      * @group RelationsTest
      * @group testBelongsTo
      */
-    public function testBelongsTo()
-    {
+    public function testBelongsTo() {
         $user = User::create(['name' => 'George R. R. Martin']);
         Book::create(['title' => 'A Game of Thrones', 'author_id' => $user->_id]);
         $book = Book::create(['title' => 'A Clash of Kings', 'author_id' => $user->_id]);
@@ -69,8 +65,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testHasOne()
-    {
+    public function testHasOne() {
         $user = User::create(['name' => 'John Doe']);
         Role::create(['type' => 'admin', 'user_id' => $user->_id]);
 
@@ -95,8 +90,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testWithBelongsTo()
-    {
+    public function testWithBelongsTo() {
         $user = User::create(['name' => 'John Doe']);
         Item::create(['type' => 'knife', 'user_id' => $user->_id]);
         Item::create(['type' => 'shield', 'user_id' => $user->_id]);
@@ -115,8 +109,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testWithHasMany()
-    {
+    public function testWithHasMany() {
         $user = User::create(['name' => 'John Doe']);
         Item::create(['type' => 'knife', 'user_id' => $user->_id]);
         Item::create(['type' => 'shield', 'user_id' => $user->_id]);
@@ -133,8 +126,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testWithHasOne()
-    {
+    public function testWithHasOne() {
         $user = User::create(['name' => 'John Doe']);
         Role::create(['type' => 'admin', 'user_id' => $user->_id]);
         Role::create(['type' => 'guest', 'user_id' => $user->_id]);
@@ -149,8 +141,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testEasyRelation()
-    {
+    public function testEasyRelation() {
         // Has Many
         $user = User::create(['name' => 'John Doe']);
         $item = Item::create(['type' => 'knife']);
@@ -178,8 +169,7 @@ class RelationsTest extends TestCase
      * @group RelationsTest
      * @group testBelongsToMany
      */
-    public function testBelongsToMany()
-    {
+    public function testBelongsToMany() {
         $user = User::create(['name' => 'John Doe']);
 
         // Add 2 clients
@@ -278,8 +268,7 @@ class RelationsTest extends TestCase
      * @group RelationsTest
      * @group _
      */
-    public function testWithBelongsToMany()
-    {
+    public function testWithBelongsToMany() {
         $user = User::create(['name' => 'John Doe']);
 
         // Add 2 clients
@@ -383,8 +372,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testBelongsToManyAttachesExistingModels()
-    {
+    public function testBelongsToManyAttachesExistingModels() {
         $client = Client::create(['name' => 'Foo Bar Ltd.', 'user_ids' => []]);
         $user = User::create(['name' => 'John Doe', 'client_ids' => [$client->_id,]]);
 
@@ -424,8 +412,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testDetachNonExistingModel()
-    {
+    public function testDetachNonExistingModel() {
         $client = Client::create(['name' => 'Foo Bar Ltd.']);
         $user = User::create(['name' => 'John Doe', 'client_ids' => [$client->_id,]]);
         $user2 = User::create(['name' => 'John Doe2', 'client_ids' => [$client->_id,]]);
@@ -442,8 +429,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testDetachModelsWithMissingColumn()
-    {
+    public function testDetachModelsWithMissingColumn() {
         $user = User::create(['name' => 'John Doe', 'client_ids' => ['non_existing_client_id']]);
 
         // Sync multiple records
@@ -458,8 +444,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testBelongsToManySync()
-    {
+    public function testBelongsToManySync() {
         // create test instances
         $user = User::create(['name' => 'John Doe']);
         $client1 = Client::create(['name' => 'Pork Pies Ltd.'])->_id;
@@ -488,8 +473,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testBelongsToManyAttachArray()
-    {
+    public function testBelongsToManyAttachArray() {
         $user = User::create(['name' => 'John Doe']);
         $client1 = Client::create(['name' => 'Test 1'])->_id;
         $client2 = Client::create(['name' => 'Test 2'])->_id;
@@ -502,8 +486,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testBelongsToManyAttachEloquentCollection()
-    {
+    public function testBelongsToManyAttachEloquentCollection() {
         $user = User::create(['name' => 'John Doe']);
         $client1 = Client::create(['name' => 'Test 1']);
         $client2 = Client::create(['name' => 'Test 2']);
@@ -517,8 +500,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testBelongsToManySyncAlreadyPresent()
-    {
+    public function testBelongsToManySyncAlreadyPresent() {
         $user = User::create(['name' => 'John Doe']);
         $client1 = Client::create(['name' => 'Test 1'])->_id;
         $client2 = Client::create(['name' => 'Test 2'])->_id;
@@ -537,8 +519,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testBelongsToManyCustom()
-    {
+    public function testBelongsToManyCustom() {
         $user = User::create(['name' => 'John Doe']);
         $group = $user->groups()->create(['name' => 'Admins']);
 
@@ -560,8 +541,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testBelongsToManyBindings()
-    {
+    public function testBelongsToManyBindings() {
         $user = User::create(['name' => 'John Doe']);
         $groupsRelation = $user->groups();
 
@@ -574,8 +554,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testMorph()
-    {
+    public function testMorph() {
         $user = User::create(['name' => 'John Doe']);
         $client = Client::create(['name' => 'Jane Doe']);
 
@@ -620,8 +599,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testHasManyHas()
-    {
+    public function testHasManyHas() {
         $author1 = User::create(['name' => 'George R. R. Martin']);
         $author1->books()->create(['title' => 'A Game of Thrones', 'rating' => 5]);
         $author1->books()->create(['title' => 'A Clash of Kings', 'rating' => 5]);
@@ -649,8 +627,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testHasOneHas()
-    {
+    public function testHasOneHas() {
         $user1 = User::create(['name' => 'John Doe']);
         $user1->role()->create(['title' => 'admin']);
         $user2 = User::create(['name' => 'Jane Doe']);
@@ -667,8 +644,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testNestedKeys()
-    {
+    public function testNestedKeys() {
         $client = Client::create([
             'data' => [
                 'client_id' => 35298,
@@ -696,8 +672,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testDoubleSaveOneToMany()
-    {
+    public function testDoubleSaveOneToMany() {
         $author = User::create(['name' => 'George R. R. Martin']);
         $book = Book::create(['title' => 'A Game of Thrones']);
 
@@ -722,8 +697,7 @@ class RelationsTest extends TestCase
     /**
      * @group RelationsTest
      */
-    public function testDoubleSaveManyToMany()
-    {
+    public function testDoubleSaveManyToMany() {
         $user = User::create(['name' => 'John Doe']);
         $client = Client::create(['name' => 'Admins']);
 

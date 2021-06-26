@@ -3,10 +3,8 @@
 use Mpociot\Couchbase\Query\Builder as Query;
 use Mpociot\Couchbase\Query\Grammar;
 
-class ArgsParametersTest extends TestCase
-{
-    public static function setUpBeforeClass()
-    {
+class ArgsParametersTest extends TestCase {
+    public static function setUpBeforeClass() {
         putenv('CB_INLINE_PARAMETERS=false');
         parent::setUpBeforeClass();
     }
@@ -15,8 +13,7 @@ class ArgsParametersTest extends TestCase
      * @group ArgsParametersTest
      * @group ParametersTest
      */
-    public function testParameters()
-    {
+    public function testParameters() {
         $query = DB::table('table6')->select();
 
         $this->assertEquals(false, config('database.connections.couchbase.inline_parameters'));

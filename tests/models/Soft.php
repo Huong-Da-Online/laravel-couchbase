@@ -1,10 +1,9 @@
 <?php declare(strict_types=1);
 
-use Mpociot\Couchbase\Eloquent\Model as Eloquent;
-use Mpociot\Couchbase\Eloquent\SoftDeletes;
+use HuongDaOnline\Couchbase\Eloquent\Model as Eloquent;
+use HuongDaOnline\Couchbase\Eloquent\SoftDeletes;
 
-class Soft extends Eloquent
-{
+class Soft extends Eloquent {
     use SoftDeletes;
 
     protected $connection = 'couchbase-not-default';

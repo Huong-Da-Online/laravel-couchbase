@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace Mpociot\Couchbase;
+namespace HuongDaOnline\Couchbase;
 
 use Couchbase\N1qlQuery;
 use CouchbaseBucket;
 use CouchbaseCluster;
-use Mpociot\Couchbase\Events\QueryFired;
-use Mpociot\Couchbase\Query\Builder as QueryBuilder;
-use Mpociot\Couchbase\Query\Grammar as QueryGrammar;
+use HuongDaOnline\Couchbase\Events\QueryFired;
+use HuongDaOnline\Couchbase\Query\Builder as QueryBuilder;
+use HuongDaOnline\Couchbase\Query\Grammar as QueryGrammar;
 
-class Connection extends \Illuminate\Database\Connection
-{
+class Connection extends \Illuminate\Database\Connection {
     const AUTH_TYPE_USER_PASSWORD = 'password';
     const AUTH_TYPE_CLUSTER_ADMIN = 'cluster';
     const AUTH_TYPE_NONE = 'none';
@@ -46,10 +45,9 @@ class Connection extends \Illuminate\Database\Connection
     /**
      * Create a new database connection instance.
      *
-     * @param  array $config
+     * @param array $config
      */
-    public function __construct(array $config)
-    {
+    public function __construct(array $config) {
         $this->config = $config;
 
         // Build the connection string
@@ -85,16 +83,14 @@ class Connection extends \Illuminate\Database\Connection
     /**
      * @param bool $inlineParameters
      */
-    public function setInlineParameters(bool $inlineParameters)
-    {
+    public function setInlineParameters(bool $inlineParameters) {
         $this->inlineParameters = $inlineParameters;
     }
 
     /**
      * @return bool
      */
-    public function hasInlineParameters() : bool
-    {
+    public function hasInlineParameters(): bool {
         return $this->inlineParameters;
     }
 
@@ -103,8 +99,7 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @return Query\Processor
      */
-    protected function getDefaultPostProcessor()
-    {
+    protected function getDefaultPostProcessor() {
         return new Query\Processor;
     }
 
@@ -113,19 +108,17 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @return string
      */
-    public function getBucketName()
-    {
+    public function getBucketName() {
         return $this->bucketname;
     }
 
     /**
      * Begin a fluent query against a set of document types.
      *
-     * @param  string $type
+     * @param string $type
      * @return Query\Builder
      */
-    public function builder($type)
-    {
+    public function builder($type) {
         $query = new QueryBuilder($this, $this->getQueryGrammar(), $this->getPostProcessor());
 
         return $query->from($type);
@@ -134,21 +127,19 @@ class Connection extends \Illuminate\Database\Connection
     /**
      * @return QueryBuilder
      */
-    public function query()
-    {
+    public function query() {
         return $this->builder(null);
     }
 
     /**
      * Execute an SQL statement and return the boolean result.
      *
-     * @param  string $query
-     * @param  array $bindings
+     * @param string $query
+     * @param array $bindings
      * @return bool
      * @throws \Exception
      */
-    public function statement($query, $bindings = [])
-    {
+    public function statement($query, $bindings = []) {
         return $this->run($query, $bindings, function ($query, $bindings) {
             if ($this->pretending()) {
                 return true;
@@ -165,24 +156,21 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @return mixed
      */
-    protected function executeQuery(N1qlQuery $query)
-    {
+    protected function executeQuery(N1qlQuery $query) {
         return $this->bucket->query($query);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function select($query, $bindings = [], $useReadPdo = true)
-    {
+    public function select($query, $bindings = [], $useReadPdo = true) {
         return $this->selectWithMeta($query, $bindings, $useReadPdo)->rows;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function selectWithMeta($query, $bindings = [], $useReadPdo = true)
-    {
+    public function selectWithMeta($query, $bindings = [], $useReadPdo = true) {
         return $this->run($query, $bindings, function ($query, $bindings) {
             if ($this->pretending()) {
                 return [];
@@ -203,8 +191,7 @@ class Connection extends \Illuminate\Database\Connection
      * @return int|mixed
      * @throws \Exception
      */
-    public function insert($query, $bindings = [])
-    {
+    public function insert($query, $bindings = []) {
         return $this->statement($query, $bindings);
     }
 
@@ -217,8 +204,7 @@ class Connection extends \Illuminate\Database\Connection
      * @return int|\stdClass
      * @throws \Exception
      */
-    public function update($query, $bindings = [])
-    {
+    public function update($query, $bindings = []) {
         return $this->affectingStatement($query, $bindings);
     }
 
@@ -231,8 +217,7 @@ class Connection extends \Illuminate\Database\Connection
      * @return int|\stdClass
      * @throws \Exception
      */
-    public function delete($query, $bindings = [])
-    {
+    public function delete($query, $bindings = []) {
         return $this->affectingStatement($query, $bindings);
     }
 
@@ -243,8 +228,7 @@ class Connection extends \Illuminate\Database\Connection
      * @return mixed
      * @throws \Exception
      */
-    public function affectingStatement($query, $bindings = [])
-    {
+    public function affectingStatement($query, $bindings = []) {
         return $this->run($query, $bindings, function ($query, $bindings) {
             if ($this->pretending()) {
                 return 0;
@@ -262,7 +246,7 @@ class Connection extends \Illuminate\Database\Connection
      * @return mixed
      */
     protected function runN1qlQuery(string $n1ql, array $bindings) {
-        if($this->hasInlineParameters()) {
+        if ($this->hasInlineParameters()) {
             $n1ql = $this->getQueryGrammar()->applyBindings($n1ql, $bindings);
             $bindings = [];
         }
@@ -290,30 +274,27 @@ class Connection extends \Illuminate\Database\Connection
      * @param string $query
      * @param array $options
      */
-    public function logQueryFired(string $query, array $options)
-    {
+    public function logQueryFired(string $query, array $options) {
         $this->event(new QueryFired($query, $options));
     }
 
     /**
      * Begin a fluent query against documents with given type.
      *
-     * @param  string $table
+     * @param string $table
      * @return Query\Builder
      */
-    public function type($table)
-    {
+    public function type($table) {
         return $this->builder($table);
     }
 
     /**
      * Begin a fluent query against documents with given type.
      *
-     * @param  string $table
+     * @param string $table
      * @return Query\Builder
      */
-    public function table($table)
-    {
+    public function table($table) {
         return $this->builder($table);
     }
 
@@ -322,8 +303,7 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @return Schema\Builder
      */
-    public function getSchemaBuilder()
-    {
+    public function getSchemaBuilder() {
         return new Schema\Builder($this);
     }
 
@@ -332,8 +312,7 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @return \CouchbaseBucket
      */
-    public function getCouchbaseBucket()
-    {
+    public function getCouchbaseBucket() {
         return $this->bucket;
     }
 
@@ -342,8 +321,7 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @return QueryGrammar
      */
-    public function getQueryGrammar() : QueryGrammar
-    {
+    public function getQueryGrammar(): QueryGrammar {
         return $this->queryGrammar;
     }
 
@@ -352,20 +330,18 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @return \CouchbaseCluster
      */
-    public function getCouchbaseCluster()
-    {
+    public function getCouchbaseCluster() {
         return $this->connection;
     }
 
     /**
      * Create a new Couchbase connection.
      *
-     * @param  string $dsn
-     * @param  array $config
+     * @param string $dsn
+     * @param array $config
      * @return \CouchbaseCluster
      */
-    protected function createConnection($dsn, array $config)
-    {
+    protected function createConnection($dsn, array $config) {
         $cluster = new CouchbaseCluster($config['host']);
         if (!empty($config['username']) && !empty($config['password'])) {
             if (!method_exists($cluster, 'authenticateAs')) {
@@ -379,19 +355,17 @@ class Connection extends \Illuminate\Database\Connection
     /**
      * Disconnect from the underlying Couchbase connection.
      */
-    public function disconnect()
-    {
+    public function disconnect() {
         unset($this->connection);
     }
 
     /**
      * Create a DSN string from a configuration.
      *
-     * @param  array $config
+     * @param array $config
      * @return string
      */
-    protected function getDsn(array $config)
-    {
+    protected function getDsn(array $config) {
         // Check if the user passed a complete dsn to the configuration.
         if (!empty($config['dsn'])) {
             return $config['dsn'];
@@ -413,11 +387,10 @@ class Connection extends \Illuminate\Database\Connection
     /**
      * Get the elapsed time since a given starting point.
      *
-     * @param  int $start
+     * @param int $start
      * @return float
      */
-    public function getElapsedTime($start)
-    {
+    public function getElapsedTime($start) {
         return parent::getElapsedTime($start);
     }
 
@@ -426,8 +399,7 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @return string
      */
-    public function getDriverName()
-    {
+    public function getDriverName() {
         return 'couchbase';
     }
 
@@ -436,8 +408,7 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @return Schema\Grammar
      */
-    protected function getDefaultSchemaGrammar()
-    {
+    protected function getDefaultSchemaGrammar() {
         return new Schema\Grammar;
     }
 
@@ -446,20 +417,18 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @return Query\Grammar
      */
-    protected function getDefaultQueryGrammar()
-    {
+    protected function getDefaultQueryGrammar() {
         return new Query\Grammar();
     }
 
     /**
      * Dynamically pass methods to the connection.
      *
-     * @param  string $method
-     * @param  array $parameters
+     * @param string $method
+     * @param array $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
-    {
+    public function __call($method, $parameters) {
         return call_user_func_array([$this->bucket, $method], $parameters);
     }
 }

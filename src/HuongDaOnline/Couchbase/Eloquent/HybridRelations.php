@@ -1,18 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace Mpociot\Couchbase\Eloquent;
+namespace HuongDaOnline\Couchbase\Eloquent;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
-use Mpociot\Couchbase\Relations\BelongsTo;
-use Mpociot\Couchbase\Relations\BelongsToMany;
-use Mpociot\Couchbase\Relations\HasMany;
-use Mpociot\Couchbase\Relations\HasOne;
-use Mpociot\Couchbase\Relations\MorphTo;
+use HuongDaOnline\Couchbase\Relations\BelongsTo;
+use HuongDaOnline\Couchbase\Relations\BelongsToMany;
+use HuongDaOnline\Couchbase\Relations\HasMany;
+use HuongDaOnline\Couchbase\Relations\HasOne;
+use HuongDaOnline\Couchbase\Relations\MorphTo;
 
-trait HybridRelations
-{
+trait HybridRelations {
     /**
      * Define a one-to-one relationship.
      *
@@ -21,10 +20,9 @@ trait HybridRelations
      * @param string $localKey
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function hasOne($related, $foreignKey = null, $localKey = null)
-    {
+    public function hasOne($related, $foreignKey = null, $localKey = null) {
         // Check if it is a relation with an original model.
-        if (!is_subclass_of($related, 'Mpociot\Couchbase\Eloquent\Model')) {
+        if (!is_subclass_of($related, 'HuongDaOnline\Couchbase\Eloquent\Model')) {
             return parent::hasOne($related, $foreignKey, $localKey);
         }
 
@@ -47,10 +45,9 @@ trait HybridRelations
      * @param string $localKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
-    public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
-    {
+    public function morphOne($related, $name, $type = null, $id = null, $localKey = null) {
         // Check if it is a relation with an original model.
-        if (!is_subclass_of($related, 'Mpociot\Couchbase\Eloquent\Model')) {
+        if (!is_subclass_of($related, 'HuongDaOnline\Couchbase\Eloquent\Model')) {
             return parent::morphOne($related, $name, $type, $id, $localKey);
         }
 
@@ -73,10 +70,9 @@ trait HybridRelations
      * @param string $localKey
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function hasMany($related, $foreignKey = null, $localKey = null)
-    {
+    public function hasMany($related, $foreignKey = null, $localKey = null) {
         // Check if it is a relation with an original model.
-        if (!is_subclass_of($related, 'Mpociot\Couchbase\Eloquent\Model')) {
+        if (!is_subclass_of($related, 'HuongDaOnline\Couchbase\Eloquent\Model')) {
             return parent::hasMany($related, $foreignKey, $localKey);
         }
 
@@ -99,10 +95,9 @@ trait HybridRelations
      * @param string $localKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
-    {
+    public function morphMany($related, $name, $type = null, $id = null, $localKey = null) {
         // Check if it is a relation with an original model.
-        if (!is_subclass_of($related, 'Mpociot\Couchbase\Eloquent\Model')) {
+        if (!is_subclass_of($related, 'HuongDaOnline\Couchbase\Eloquent\Model')) {
             return parent::morphMany($related, $name, $type, $id, $localKey);
         }
 
@@ -129,8 +124,7 @@ trait HybridRelations
      * @param string $relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null)
-    {
+    public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null) {
         // If no relation name was given, we will use this debug backtrace to extract
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
@@ -141,7 +135,7 @@ trait HybridRelations
         }
 
         // Check if it is a relation with an original model.
-        if (!is_subclass_of($related, 'Mpociot\Couchbase\Eloquent\Model')) {
+        if (!is_subclass_of($related, 'HuongDaOnline\Couchbase\Eloquent\Model')) {
             return parent::belongsTo($related, $foreignKey, $otherKey, $relation);
         }
 
@@ -173,8 +167,7 @@ trait HybridRelations
      * @param string $ownerKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function morphTo($name = null, $type = null, $id = null, $ownerKey = NULL)
-    {
+    public function morphTo($name = null, $type = null, $id = null, $ownerKey = NULL) {
         // If no name is provided, we will use the backtrace to get the function name
         // since that is most likely the name of the polymorphic interface. We can
         // use that to get both the class and foreign key that will be utilized.
@@ -221,8 +214,7 @@ trait HybridRelations
      * @param string $relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function belongsToMany($related, $collection = null, $foreignKey = null, $otherKey = null, $parentKey = NULL, $relatedKey = NULL, $relation = null)
-    {
+    public function belongsToMany($related, $collection = null, $foreignKey = null, $otherKey = null, $parentKey = NULL, $relatedKey = NULL, $relation = null) {
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
         // title of this relation since that is a great convention to apply.
@@ -231,7 +223,7 @@ trait HybridRelations
         }
 
         // Check if it is a relation with an original model.
-        if (!is_subclass_of($related, \Mpociot\Couchbase\Eloquent\Model::class)) {
+        if (!is_subclass_of($related, \HuongDaOnline\Couchbase\Eloquent\Model::class)) {
             return parent::belongsToMany($related, $collection, $foreignKey, $otherKey, $parentKey, $relatedKey, $relation);
         }
 

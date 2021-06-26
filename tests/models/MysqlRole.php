@@ -2,31 +2,27 @@
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Facades\Schema;
-use Mpociot\Couchbase\Eloquent\HybridRelations;
+use HuongDaOnline\Couchbase\Eloquent\HybridRelations;
 
-class MysqlRole extends Eloquent
-{
+class MysqlRole extends Eloquent {
     use HybridRelations;
 
     protected $connection = 'mysql';
     protected $table = 'roles';
     protected static $unguarded = true;
 
-    public function user()
-    {
+    public function user() {
         return $this->belongsTo('User');
     }
 
-    public function mysqlUser()
-    {
+    public function mysqlUser() {
         return $this->belongsTo('MysqlUser');
     }
 
     /**
      * Check if we need to run the schema.
      */
-    public static function executeSchema()
-    {
+    public static function executeSchema() {
         $schema = Schema::connection('mysql');
 
         if (!$schema->hasTable('roles')) {

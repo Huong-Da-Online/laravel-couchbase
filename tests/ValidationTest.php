@@ -1,14 +1,11 @@
 <?php declare(strict_types=1);
 
-class ValidationTest extends TestCase
-{
-    public function tearDown()
-    {
+class ValidationTest extends TestCase {
+    public function tearDown() {
         User::truncate();
     }
 
-    public function testUnique()
-    {
+    public function testUnique() {
         $validator = Validator::make(
             ['name' => 'John Doe'],
             ['name' => 'required|unique:couchbase-not-default.users']

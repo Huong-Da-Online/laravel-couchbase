@@ -1,9 +1,7 @@
 <?php declare(strict_types=1);
 
-class ConnectionTest extends TestCase
-{
-    public function testConnection()
-    {
+class ConnectionTest extends TestCase {
+    public function testConnection() {
         $connection = DB::connection('couchbase-default');
         $this->assertInstanceOf('Mpociot\Couchbase\Connection', $connection);
     }
@@ -11,8 +9,7 @@ class ConnectionTest extends TestCase
     /**
      * @group testReconnect
      */
-    public function testReconnect()
-    {
+    public function testReconnect() {
         $this->markTestSkipped('Reconnect is currently not required.');
 
         /** @var \Mpociot\Couchbase\Connection $c1 */
@@ -40,8 +37,7 @@ class ConnectionTest extends TestCase
     /**
      * @group testReconnect
      */
-    public function testConnectionSingleton()
-    {
+    public function testConnectionSingleton() {
         /** @var \Mpociot\Couchbase\Connection $c1 */
         /** @var \Mpociot\Couchbase\Connection $c2 */
         $c1 = DB::connection();
@@ -60,8 +56,7 @@ class ConnectionTest extends TestCase
         $this->assertEquals(spl_object_hash($c1->getCouchbaseCluster()), spl_object_hash($c2->getCouchbaseCluster()));
     }
 
-    public function testDb()
-    {
+    public function testDb() {
         $connection = DB::connection();
         $this->assertInstanceOf('CouchbaseBucket', $connection->getCouchbaseBucket());
         $this->assertInstanceOf('CouchbaseCluster', $connection->getCouchbaseCluster());
@@ -75,8 +70,7 @@ class ConnectionTest extends TestCase
         $this->assertInstanceOf('CouchbaseCluster', $connection->getCouchbaseCluster());
     }
 
-    public function testBucketWithTypes()
-    {
+    public function testBucketWithTypes() {
         $connection = DB::connection();
         $this->assertInstanceOf('Mpociot\Couchbase\Query\Builder', $connection->builder('unittests'));
         $this->assertInstanceOf('Mpociot\Couchbase\Query\Builder', $connection->table('unittests'));
@@ -93,8 +87,7 @@ class ConnectionTest extends TestCase
         $this->assertInstanceOf('Mpociot\Couchbase\Query\Builder', $connection->type('unittests'));
     }
 
-    public function testQueryLog()
-    {
+    public function testQueryLog() {
         DB::enableQueryLog();
 
         $this->assertEquals(0, count(DB::getQueryLog()));
@@ -116,8 +109,7 @@ class ConnectionTest extends TestCase
 
     }
 
-    public function testDriverName()
-    {
+    public function testDriverName() {
         $driver = DB::connection()->getDriverName();
         $this->assertEquals('couchbase', $driver);
 
