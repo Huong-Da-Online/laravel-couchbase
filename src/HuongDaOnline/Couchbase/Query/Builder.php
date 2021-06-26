@@ -241,12 +241,12 @@ class Builder extends BaseBuilder {
      * @param string $type
      * @return $this
      */
-    public function from($type) {
+    public function from($table, $as = null) {
         $this->from = $this->connection->getBucketName();
-        $this->type = $type;
+        $this->type = $table;
 
-        if (!is_null($type)) {
-            $this->where(Helper::TYPE_NAME, $type);
+        if (!is_null($table)) {
+            $this->where(Helper::TYPE_NAME, $table);
         }
         return $this;
     }
@@ -475,12 +475,19 @@ class Builder extends BaseBuilder {
             foreach ($values as &$value) {
                 $value[Helper::TYPE_NAME] = $this->type;
                 $key = Helper::getUniqueId($this->type);
-                $result = $this->connection->getCouchbaseBucket()->upsert($key, Grammar::removeMissingValue($value));
+                $result = $this
+                    ->connection
+                    ->getCouchbaseBucket()
+                    ->defaultCollection()
+                    ->upsert($key, Grammar::removeMissingValue($value));
             }
         } else {
             $values[Helper::TYPE_NAME] = $this->type;
-            $result = $this->connection->getCouchbaseBucket()->upsert($this->keys,
-                Grammar::removeMissingValue($values));
+            $result = $this
+                ->connection
+                ->getCouchbaseBucket()
+                ->defaultCollection()
+                ->upsert($this->keys, Grammar::removeMissingValue($values));
         }
 
         return $result;

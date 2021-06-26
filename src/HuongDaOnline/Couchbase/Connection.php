@@ -48,6 +48,7 @@ class Connection extends \Illuminate\Database\Connection {
     public function __construct(array $config) {
         $this->config = $config;
         $this->bucketname = $config['bucket'];
+        $this->createConnection();
         $this->inlineParameters = isset($config['inline_parameters']) ? (bool)$config['inline_parameters'] : false;
         $this->useDefaultQueryGrammar();
         $this->useDefaultPostProcessor();
