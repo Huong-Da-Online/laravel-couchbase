@@ -1,0 +1,42 @@
+{
+    "name": "huong-da-online/laravel-couchbase",
+    "description": "A Couchbase based Eloquent model and Query builder for Laravel bu Huong Da Online",
+    "keywords": ["laravel","eloquent","couchbase","database","model"],
+    "homepage": "https://github.com/Huong-Da-Online/laravel-couchbase",
+    "authors": [
+    ],
+    "license" : "MIT",
+    "require": {
+        "php": "^7.3|^8.0",
+        "illuminate/support": "^8.48",
+        "illuminate/container": "^8.48",
+        "illuminate/database": "^8.48",
+        "illuminate/events": "^8.48",
+        "ext-couchbase": ">=3.1.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.3.3",
+        "orchestra/testbench": "^6.18.0",
+        "mockery/mockery": "^1.4.2"
+    },
+    "autoload": {
+        "psr-0": {
+            "Mpociot\\Couchbase": "src/",
+            "Mpociot\\Eloquent": "src/"
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/TestCase.php",
+            "tests/models",
+            "tests/seeds"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Huong-Da-Online\\Couchbase\\CouchbaseServiceProvider"
+            ]
+        }
+    }
+}
