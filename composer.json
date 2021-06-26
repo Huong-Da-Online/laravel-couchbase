@@ -19,8 +19,8 @@
     },
     "autoload": {
         "psr-0": {
-            "Mpociot\\Couchbase": "src/",
-            "Mpociot\\Eloquent": "src/"
+            "HuongDaOnline\\Couchbase\\": "src/",
+            "HuongDaOnline\\Eloquent": "src/"
         }
     },
     "autoload-dev": {
