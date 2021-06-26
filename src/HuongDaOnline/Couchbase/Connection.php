@@ -2,9 +2,7 @@
 
 namespace HuongDaOnline\Couchbase;
 
-use Couchbase\N1qlQuery;
 use CouchbaseBucket;
-use CouchbaseCluster;
 use HuongDaOnline\Couchbase\Events\QueryFired;
 use HuongDaOnline\Couchbase\Query\Builder as QueryBuilder;
 use HuongDaOnline\Couchbase\Query\Grammar as QueryGrammar;
@@ -25,7 +23,7 @@ class Connection extends \Illuminate\Database\Connection {
     protected $metrics;
 
     /** @var int  default consistency */
-    protected $consistency = N1qlQuery::REQUEST_PLUS;
+    protected $consistency = \Couchbase\QueryScanConsistency::REQUEST_PLUS;
 
     /**
      * The Couchbase connection handler.
@@ -49,32 +47,8 @@ class Connection extends \Illuminate\Database\Connection {
      */
     public function __construct(array $config) {
         $this->config = $config;
-
-        // Build the connection string
-        $dsn = $this->getDsn($config);
-
-        // Create the connection
-        $this->connection = $this->createConnection($dsn, $config);
-        if (isset($config['username']) && isset($config['password']) && isset($config['auth_type'])) {
-            if ($config['auth_type'] === self::AUTH_TYPE_USER_PASSWORD) {
-                // Couchbase 5.x
-                $cbAuth = new \Couchbase\PasswordAuthenticator();
-                $cbAuth->username($config['username']);
-                $cbAuth->password($config['password']);
-                $this->connection->authenticate($cbAuth);
-            } elseif ($config['auth_type'] === self::AUTH_TYPE_CLUSTER_ADMIN) {
-                // Couchbase 4.x
-                $cbAuth = new \CouchbaseAuthenticator();
-                $cbAuth->cluster($config['username'], $config['password']);
-                $this->connection->authenticate($cbAuth);
-            }
-        }
-
-        // Select database
         $this->bucketname = $config['bucket'];
-        $this->bucket = $this->connection->openBucket($this->bucketname);
         $this->inlineParameters = isset($config['inline_parameters']) ? (bool)$config['inline_parameters'] : false;
-
         $this->useDefaultQueryGrammar();
         $this->useDefaultPostProcessor();
         $this->useDefaultSchemaGrammar();
@@ -144,9 +118,7 @@ class Connection extends \Illuminate\Database\Connection {
             if ($this->pretending()) {
                 return true;
             }
-
             $result = $this->runN1qlQuery($query, $bindings);
-
             return $result->status === 'success';
         });
     }
@@ -157,6 +129,7 @@ class Connection extends \Illuminate\Database\Connection {
      * @return mixed
      */
     protected function executeQuery(N1qlQuery $query) {
+        $this->createConnection();
         return $this->bucket->query($query);
     }
 
@@ -164,7 +137,7 @@ class Connection extends \Illuminate\Database\Connection {
      * {@inheritdoc}
      */
     public function select($query, $bindings = [], $useReadPdo = true) {
-        return $this->selectWithMeta($query, $bindings, $useReadPdo)->rows;
+        return $this->selectWithMeta($query, $bindings, $useReadPdo)->rows();
     }
 
     /**
@@ -246,19 +219,16 @@ class Connection extends \Illuminate\Database\Connection {
      * @return mixed
      */
     protected function runN1qlQuery(string $n1ql, array $bindings) {
-        if ($this->hasInlineParameters()) {
+        $this->createConnection();
+        if (count($bindings) > 0) {
             $n1ql = $this->getQueryGrammar()->applyBindings($n1ql, $bindings);
             $bindings = [];
         }
-
-        $query = N1qlQuery::fromString($n1ql);
-        $query->consistency($this->consistency);
-        $query->positionalParams($bindings);
-        // TODO $query->namedParams(['parameters' => $bindings]);
-
+        $opts = new \Couchbase\QueryOptions();
+        $opts->scanConsistency($this->consistency);
         $isSuccessFul = false;
         try {
-            $result = $this->executeQuery($query);
+            $result = $this->connection->query($n1ql, $opts);
             $isSuccessFul = true;
         } finally {
             $this->logQueryFired($n1ql, [
@@ -294,7 +264,7 @@ class Connection extends \Illuminate\Database\Connection {
      * @param string $table
      * @return Query\Builder
      */
-    public function table($table) {
+    public function table($table, $as = NULL) {
         return $this->builder($table);
     }
 
@@ -341,14 +311,13 @@ class Connection extends \Illuminate\Database\Connection {
      * @param array $config
      * @return \CouchbaseCluster
      */
-    protected function createConnection($dsn, array $config) {
-        $cluster = new CouchbaseCluster($config['host']);
-        if (!empty($config['username']) && !empty($config['password'])) {
-            if (!method_exists($cluster, 'authenticateAs')) {
-                throw new \RuntimeException('The couchbase php sdk does not support password authentication below version 2.4.0.');
-            }
-            $cluster->authenticateAs(strval($config['username']), strval($config['password']));
-        }
+    protected function createConnection() {
+        $connectionString = "couchbase://" . $this->config['host'];
+        $options = new \Couchbase\ClusterOptions();
+        $options->credentials($this->config['username'], $this->config['password']);
+        $cluster = new \Couchbase\Cluster($connectionString, $options);
+        $this->connection = $cluster;
+        $this->bucket = $cluster->bucket($this->bucketname);
         return $cluster;
     }
 
@@ -421,14 +390,11 @@ class Connection extends \Illuminate\Database\Connection {
         return new Query\Grammar();
     }
 
-    /**
-     * Dynamically pass methods to the connection.
-     *
-     * @param string $method
-     * @param array $parameters
-     * @return mixed
-     */
+    private function connection($test) {
+//        return $this->bucket->defaultCollection()->;
+    }
+
     public function __call($method, $parameters) {
-        return call_user_func_array([$this->bucket, $method], $parameters);
+        return call_user_func_array([$this, $method], $parameters);
     }
 }
