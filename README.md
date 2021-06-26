@@ -1,8 +1,8 @@
 Laravel Couchbase
 ===============
 
-[![Build Status](http://img.shields.io/travis/mpociot/laravel-couchbase.svg)](https://travis-ci.org/mpociot/laravel-couchbase)
-[![codecov](https://codecov.io/gh/mpociot/laravel-couchbase/branch/master/graph/badge.svg)](https://codecov.io/gh/mpociot/laravel-couchbase)
+[![Build Status](http://img.shields.io/travis/HuongDaOnline/laravel-couchbase.svg)](https://travis-ci.org/HuongDaOnline/laravel-couchbase)
+[![codecov](https://codecov.io/gh/HuongDaOnline/laravel-couchbase/branch/master/graph/badge.svg)](https://codecov.io/gh/HuongDaOnline/laravel-couchbase)
 
 An Eloquent model and Query builder with support for Couchbase, using the original Laravel API. *This library extends the original Laravel classes, so it uses exactly the same methods.*
 
@@ -26,19 +26,19 @@ Make sure you have the Couchbase PHP driver installed. You can find installation
 Installation using composer:
 
 ```
-composer require mpociot/couchbase
+composer require huong-da-online/laravel-couchbase
 ```
 
 And add the service provider in `config/app.php`:
 
 ```php
-Mpociot\Couchbase\CouchbaseServiceProvider::class,
+HuongDaOnline\Couchbase\CouchbaseServiceProvider::class,
 ```
 
 For usage with [Lumen](http://lumen.laravel.com), add the service provider in `bootstrap/app.php`. In this file, you will also need to enable Eloquent. You must however ensure that your call to `$app->withEloquent();` is **below** where you have registered the `CouchbaseServiceProvider `:
 
 ```php
-$app->register(Mpociot\Couchbase\CouchbaseServiceProvider::class);
+$app->register(HuongDaOnline\Couchbase\CouchbaseServiceProvider::class);
 
 $app->withEloquent();
 ```
@@ -48,9 +48,8 @@ The service provider will register a couchbase database extension with the origi
 For usage outside Laravel, check out the [Capsule manager](https://github.com/illuminate/database/blob/master/README.md) and add:
 
 ```php
-$capsule->getDatabaseManager()->extend('couchbase', function($config)
-{
-    return new Mpociot\Couchbase\Connection($config);
+$capsule->getDatabaseManager()->extend('couchbase', function($config) {
+    return new HuongDaOnline\Couchbase\Connection($config);
 });
 ```
 
@@ -100,7 +99,7 @@ Eloquent
 This package includes a Couchbase enabled Eloquent class that you can use to define models for corresponding collections.
 
 ```php
-use Mpociot\Couchbase\Eloquent\Model as Eloquent;
+use HuongDaOnline\Couchbase\Eloquent\Model as Eloquent;
 
 class User extends Eloquent {}
 ```
@@ -110,7 +109,7 @@ As Couchbase does not provide the concept of tables, documents will instead be d
 You may specify a custom type (alias for table) by defining a `table` property on your model:
 
 ```php
-use Mpociot\Couchbase\Eloquent\Model as Eloquent;
+use HuongDaOnline\Couchbase\Eloquent\Model as Eloquent;
 
 class User extends Eloquent {
 
@@ -122,7 +121,7 @@ class User extends Eloquent {
 **NOTE:** Eloquent will also assume that each collection has a primary key column named `_id`. You may define a `primaryKey` property to override this convention. Likewise, you may define a `connection` property to override the name of the database connection that should be used when utilizing the model.
 
 ```php
-use Mpociot\Couchbase\Eloquent\Model as Eloquent;
+use HuongDaOnline\Couchbase\Eloquent\Model as Eloquent;
 
 class MyModel extends Eloquent {
 
@@ -138,7 +137,7 @@ Everything else (should) work just like the original Eloquent model. Read more a
 You may also register an alias for the Couchbase model by adding the following to the alias array in `config/app.php`:
 
 ```php
-'CouchbaseModel'       => 'Mpociot\Couchbase\Eloquent\Model',
+'CouchbaseModel'       => 'HuongDaOnline\Couchbase\Eloquent\Model',
 ```
 
 This will allow you to use the registered alias like:
@@ -322,7 +321,7 @@ User::where('bmi', 30)->decrement('bmi', 1, ['category' => 'overweight']);
 When soft deleting a model, it is not actually removed from your database. Instead, a deleted_at timestamp is set on the record. To enable soft deletes for a model, apply the SoftDeletingTrait to the model:
 
 ```php
-use Mpociot\Couchbase\Eloquent\SoftDeletes;
+use HuongDaOnline\Couchbase\Eloquent\SoftDeletes;
 
 class User extends Eloquent {
 
@@ -394,7 +393,7 @@ Supported relations are:
 Example:
 
 ```php
-use Mpociot\Couchbase\Eloquent\Model as Eloquent;
+use HuongDaOnline\Couchbase\Eloquent\Model as Eloquent;
 
 class User extends Eloquent {
 
@@ -409,7 +408,7 @@ class User extends Eloquent {
 And the inverse relation:
 
 ```php
-use Mpociot\Couchbase\Eloquent\Model as Eloquent;
+use HuongDaOnline\Couchbase\Eloquent\Model as Eloquent;
 
 class Item extends Eloquent {
 
@@ -424,7 +423,7 @@ class Item extends Eloquent {
 The belongsToMany relation will not use a pivot "table", but will push id's to a __related_ids__ attribute instead. This makes the second parameter for the belongsToMany method useless. If you want to define custom keys for your relation, set it to `null`:
 
 ```php
-use Mpociot\Couchbase\Eloquent\Model as Eloquent;
+use HuongDaOnline\Couchbase\Eloquent\Model as Eloquent;
 
 class User extends Eloquent {
 
@@ -446,7 +445,7 @@ If you want to embed models, rather than referencing them, you can use the `embe
 **REMEMBER**: these relations return Eloquent collections, they don't return query builder objects!
 
 ```php
-use Mpociot\Couchbase\Eloquent\Model as Eloquent;
+use HuongDaOnline\Couchbase\Eloquent\Model as Eloquent;
 
 class User extends Eloquent {
 
@@ -523,7 +522,7 @@ Embedded relations will return a Collection of embedded items instead of a query
 The embedsOne relation is similar to the EmbedsMany relation, but only embeds a single model.
 
 ```php
-use Mpociot\Couchbase\Eloquent\Model as Eloquent;
+use HuongDaOnline\Couchbase\Eloquent\Model as Eloquent;
 
 class Book extends Eloquent {
 
@@ -571,12 +570,12 @@ $book->author()->save($newAuthor);
 
 ### MySQL Relations
 
-If you're using a hybrid Couchbase and SQL setup, you're in luck! The model will automatically return a Couchbase- or SQL-relation based on the type of the related model. Of course, if you want this functionality to work both ways, your SQL-models will need use the `Mpociot\Couchbase\Eloquent\HybridRelations` trait. Note that this functionality only works for hasOne, hasMany and belongsTo relations.
+If you're using a hybrid Couchbase and SQL setup, you're in luck! The model will automatically return a Couchbase- or SQL-relation based on the type of the related model. Of course, if you want this functionality to work both ways, your SQL-models will need use the `HuongDaOnline\Couchbase\Eloquent\HybridRelations` trait. Note that this functionality only works for hasOne, hasMany and belongsTo relations.
 
 Example SQL-based User model:
 
 ```php
-use Mpociot\Couchbase\Eloquent\HybridRelations;
+use HuongDaOnline\Couchbase\Eloquent\HybridRelations;
 
 class User extends Eloquent {
 
@@ -595,7 +594,7 @@ class User extends Eloquent {
 And the Couchbase-based Message model:
 
 ```php
-use Mpociot\Couchbase\Eloquent\Model as Eloquent;
+use HuongDaOnline\Couchbase\Eloquent\Model as Eloquent;
 
 class Message extends Eloquent {
 

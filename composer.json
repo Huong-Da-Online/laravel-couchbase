@@ -3,8 +3,6 @@
     "description": "A Couchbase based Eloquent model and Query builder for Laravel bu Huong Da Online",
     "keywords": ["laravel","eloquent","couchbase","database","model"],
     "homepage": "https://github.com/Huong-Da-Online/laravel-couchbase",
-    "authors": [
-    ],
     "license" : "MIT",
     "require": {
         "php": "^7.3|^8.0",
@@ -35,7 +33,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Huong-Da-Online\\Couchbase\\CouchbaseServiceProvider"
+                "HuongDaOnline\\Couchbase\\CouchbaseServiceProvider"
             ]
         }
     }
